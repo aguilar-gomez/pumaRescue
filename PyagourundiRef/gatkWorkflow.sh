@@ -23,12 +23,16 @@ FASTA=$REFERENCE
 #Regions to exclude:
 export REPEATMASK=~/project-klohmuel/Bricei/reference/GCA_028023285.1_mBalRic1.hap2_genomic.fna_rm4.1.4_TRF_merged.bed
 ################################################################################
-#Modules
-module load picard_tools/2.25.0 
-module load samtools/1.15
-module load bwa/0.7.17
-module load bedtools/2.30.0
-module load htslib
+#Activate conda environment
+
+#GATK v4.2.2.0
+#HTSJDK Version: 2.24.1
+#Picard Version: 2.25.4
+#bedtools v2.27.1
+#bwa0.7.17-r1188
+#samtools 1.19
+#htslib 1.19
+conda activate gatk_env
 ################################################################################
 #Generate indexes
 ### Generate index files and intervals, sizes lists
