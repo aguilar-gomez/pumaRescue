@@ -18,10 +18,10 @@
 #   - Extract autosomes
 ################################################################################
 ### Set variables
-export REFERENCE=~/project-klohmuel/Bricei/reference/GCA_028023285.1_mBalRic1.hap2_genomic.fna
+export REFERENCE=~/space/s1/lin.yuan/puma/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 FASTA=$REFERENCE
 #Regions to exclude:
-export REPEATMASK=~/project-klohmuel/Bricei/reference/GCA_028023285.1_mBalRic1.hap2_genomic.fna_rm4.1.4_TRF_merged.bed
+#export REPEATMASK=~/project-klohmuel/Bricei/reference/GCA_028023285.1_mBalRic1.hap2_genomic.fna_rm4.1.4_TRF_merged.bed
 ################################################################################
 #Activate conda environment
 
@@ -59,26 +59,10 @@ N=$((N+1))
 mkdir intervals
 mv ${FASTA}.intervals_25Mb_* intervals
 
-### PER-SAMPLE PROCESSING
-#Sample IDs
-#Correct species name
-for i in *bam; do
-  mv "$i" "`echo $i | sed "s/Bede/Bricei/"`";
-done
-
-for bam in *bam ; do 
-  id=${bam%_*}; echo $id $bam 
-  samtools index $bam &
-done; 
-
-
 ###DepthOfCoverage
 
 export NUMTHREADS=8
 
-#The Genome Analysis Toolkit (GATK) v4.2.0.0
-#HTSJDK Version: 2.24.0
-#Picard Version: 2.25.0
 # -mbq : minimum Phred quality score
 # -mmq : minimum mapping quality
 # -omitBaseOutput : do not output per base details (to omit unecessary output)
@@ -88,10 +72,9 @@ export NUMTHREADS=8
 # There are several ways to estimate coverage, this tool matches the haplotype caller algorithm
 
 
-
-#$ -l highp,h_rt=72:00:00,h_data=24G
-#$ -pe shared 4
-
+for bam in *bam 
+do 
+NAME=${bam%%.bam}
 gatk DepthOfCoverage \
 -RF GoodCigarReadFilter \
 -RF NonZeroReferenceLengthAlignmentReadFilter \
@@ -103,35 +86,25 @@ gatk DepthOfCoverage \
 --omit-depth-output-at-each-base \
 -R ${REFERENCE} \
 -L ${REFERENCE}.list \
--I ${NAME}_dedup.bam \
--O ${NAME}_dedup.bam
+-I ${NAME}.yag.bam \
+-O ${NAME}yag.bam
+done
 
 ### Generate gVCF files (per chromosome)
 export NUMTHREADS=4
 
 
 #!/bin/bash
-#$ -cwd
-#$ -j y
-#$ -o HapCaller1.log.$JOB_ID.$TASK_ID
-#$ -l highp,h_rt=72:00:00,h_data=24G
-## and the number of cores as needed:
-#$ -pe shared 4
-#$ -M daguilar
-#$ -m bea
-#$ -t 1-450:1
-
-. /u/local/Modules/default/init/modules.sh
-
-IDX=$(printf %03d ${SGE_TASK_ID})
+for interval in intervals.bed
+do
 REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
 gatk HaplotypeCaller \
 -ERC BP_RESOLUTION \
 --minimum-mapping-quality 30 \
---min-base-quality-score 20 \
+--min-base-quality-score 25 \
 -R ${REFERENCE} \
 -L ${REGION} \
--I ${NAME}_dedup.bam \
+-I ${NAME}.yag.bam \
 -O ${NAME}_${IDX}.g.vcf.gz
 
 ################################################################################
@@ -139,7 +112,6 @@ gatk HaplotypeCaller \
 ### CombineGVCFs
 #Combine individuals into a single VCF
 
-IDX=$(printf %03d ${SGE_TASK_ID})
 REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
 gatk CombineGVCFs \
 -R ${REFERENCE} \
