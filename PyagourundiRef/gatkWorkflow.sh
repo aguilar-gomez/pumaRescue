@@ -44,20 +44,21 @@ picard CreateSequenceDictionary REFERENCE=${FASTA} OUTPUT=${FASTA%.fna*}.dict
 bwa index -a bwtsw ${FASTA} 
 
 #Generate chunks
-### Make 25 Mb intervals for splitting jobs
+### Make 250 Mb intervals for splitting jobs
 SIZES=${FASTA}.sizes
 #generate windows
-bedtools makewindows -g ${SIZES} -w 25000000 -s 25000000  > ${FASTA}.intervals_25Mb.bed
+# THE GENOME IS TOO FRAGMENTED.. SEEMS NOT WORKING WELL
+bedtools makewindows -g ${SIZES} -w 250000000 -s 250000000  > ${FASTA}.intervals_250Mb.bed
 #Split by chromosome or scaffold
-split -l1 --numeric-suffixes=1 -a 5 ${FASTA}.intervals_25Mb.bed ${FASTA}.intervals_25Mb_
-for f in ${FASTA}.intervals_25Mb_* ; do mv ${f} ${f}.bed ; done
+split -l1 --numeric-suffixes=1 -a 3 ${FASTA}.intervals_250Mb.bed ${FASTA}.intervals_250Mb_
+for f in ${FASTA}.intervals_250Mb_* ; do mv ${f} ${f}.bed ; done
 
 #Count intervals
-N=$(ls ${FASTA}.intervals_25Mb_*.bed | wc -l)
+N=$(ls ${FASTA}.intervals_250Mb_*.bed | wc -l)
 N=$((N+1))
 
 mkdir intervals
-mv ${FASTA}.intervals_25Mb_* intervals
+mv ${FASTA}.intervals_250Mb_* intervals
 
 ###DepthOfCoverage
 
@@ -88,22 +89,22 @@ gatk DepthOfCoverage \
 -O ${NAME}.DepOfCoverage
 done
 
-### Generate gVCF files (per chromosome)
-export NUMTHREADS=4
+### Generate gVCF files (may not be very able to do per chromosome..too much file)
+# under gatk_haplotypecaller folder
+# cp -s /space/s1/lin.yuan/puma/bam_output_allsampletoOutgroup/allbams/* .
 
+for bam in *.yag.bam; do
+NAME=${bam%%.yag.*}
 
-#!/bin/bash
-for interval in intervals.bed
-do
-REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
 gatk HaplotypeCaller \
 -ERC BP_RESOLUTION \
 --minimum-mapping-quality 30 \
 --min-base-quality-score 25 \
 -R ${REFERENCE} \
--L ${REGION} \
 -I ${NAME}.yag.bam \
--O ${NAME}_${IDX}.g.vcf.gz
+-O ${NAME}.vcf.gz
+-nt 10
+done
 
 ################################################################################
 ### JOINT VCF FILE PROCESSING
