@@ -18,10 +18,10 @@
 #   - Extract autosomes
 ################################################################################
 ### Set variables
-export REFERENCE=~/space/s1/lin.yuan/puma/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
+export REFERENCE=/space/s1/lin.yuan/puma/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 FASTA=$REFERENCE
 #Regions to exclude:
-#export REPEATMASK=~/project-klohmuel/Bricei/reference/GCA_028023285.1_mBalRic1.hap2_genomic.fna_rm4.1.4_TRF_merged.bed
+#export REPEATMASK=CURRENTLY_DONT_HAVE_THIS
 ################################################################################
 #Activate conda environment
 
@@ -40,7 +40,7 @@ samtools faidx ${FASTA}
 cut -f1 ${FASTA}.fai > ${FASTA}.list
 cut -f1-2 ${FASTA}.fai  > ${FASTA}.sizes
 
-java -jar $PICARD CreateSequenceDictionary REFERENCE=${FASTA} OUTPUT=${FASTA%.fna*}.dict 
+picard CreateSequenceDictionary REFERENCE=${FASTA} OUTPUT=${FASTA%.fna*}.dict 
 bwa index -a bwtsw ${FASTA} 
 
 #Generate chunks
@@ -49,7 +49,7 @@ SIZES=${FASTA}.sizes
 #generate windows
 bedtools makewindows -g ${SIZES} -w 25000000 -s 25000000  > ${FASTA}.intervals_25Mb.bed
 #Split by chromosome or scaffold
-split -l1 --numeric-suffixes=1 -a 3 ${FASTA}.intervals_25Mb.bed ${FASTA}.intervals_25Mb_
+split -l1 --numeric-suffixes=1 -a 5 ${FASTA}.intervals_25Mb.bed ${FASTA}.intervals_25Mb_
 for f in ${FASTA}.intervals_25Mb_* ; do mv ${f} ${f}.bed ; done
 
 #Count intervals
@@ -61,8 +61,6 @@ mv ${FASTA}.intervals_25Mb_* intervals
 
 ###DepthOfCoverage
 
-export NUMTHREADS=8
-
 # -mbq : minimum Phred quality score
 # -mmq : minimum mapping quality
 # -omitBaseOutput : do not output per base details (to omit unecessary output)
@@ -71,10 +69,10 @@ export NUMTHREADS=8
 # -rf MappingQualityUnavailable : exclude if there is no mapping quality available
 # There are several ways to estimate coverage, this tool matches the haplotype caller algorithm
 
-
-for bam in *bam 
-do 
-NAME=${bam%%.bam}
+# under gatk_DepthOfCoverage folder
+# cp -s /space/s1/lin.yuan/puma/bam_output_allsampletoOutgroup/allbams/* .
+for bam in *.yag.bam; do
+NAME=${bam%%.yag.*}
 gatk DepthOfCoverage \
 -RF GoodCigarReadFilter \
 -RF NonZeroReferenceLengthAlignmentReadFilter \
@@ -87,7 +85,7 @@ gatk DepthOfCoverage \
 -R ${REFERENCE} \
 -L ${REFERENCE}.list \
 -I ${NAME}.yag.bam \
--O ${NAME}yag.bam
+-O ${NAME}.DepOfCoverage
 done
 
 ### Generate gVCF files (per chromosome)
