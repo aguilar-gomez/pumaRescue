@@ -102,8 +102,8 @@ gatk HaplotypeCaller \
 --min-base-quality-score 25 \
 -R ${REFERENCE} \
 -I ${NAME}.yag.bam \
--O ${NAME}.vcf.gz
--nt 10
+-O ${NAME}.vcf.gz \
+--native-pair-hmm-threads 10
 done
 
 ################################################################################
