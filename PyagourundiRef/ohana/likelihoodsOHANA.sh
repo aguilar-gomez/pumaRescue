@@ -27,6 +27,50 @@ nohup $OHANA/convert bgl2lgm ./puma_likelihoods.beagle ./puma.lgm &
 
 #Do OHANA as usual using the .lgm files
 
+
+# without downsampling
+# cuz total sites are already just 852460
+Kmin=3 # min value of k
+Kmax=6 # maximum value of k
+# don’t run everything in one time; it is too thread-consuming
+mi=450 # maximum number of iterations
+e=0.08 # the minimum between the likelihood difference per iteration
+qpas=/home/diana/programs/ohana/bin/qpas
+lgmName=./puma.lgm
+matrixName=puma
+
+for k in $(seq $Kmin $Kmax)
+do
+echo "running qpas with k $k"
+$qpas $lgmName -k $k -qo ${matrixName}_k${k}_e${e}_mi${mi}_q.matrix -fo ${matrixName}_k${k}_e${e}_mi${mi}_f.matrix -e ${e} -mi $mi > out.qpas_${matrixName}_k${k}mi${mi}e${e} &
+done
+
+# run nemeco tree
+Kmin=3 # min value of k
+Kmax=6 # maximum value of k
+OHANA=/home/diana/programs/ohana/bin
+mi=450 # maximum number of iterations
+e=0.08 # the minimum between the likelihood difference per iteration
+lgmName=./puma.lgm
+matrixName=puma
+
+for k in $(seq $Kmin $Kmax);
+do
+echo "running nemeco with k $k"
+$OHANA/nemeco $lgmName ${matrixName}_k${k}_e${e}_mi${mi}_f.matrix -co c.matrix_${matrixName}_k${k} -mi 5 > out_${matrixName}_.nemk${k}
+$OHANA/convert cov2nwk c.matrix_${matrixName}_k${k} ${matrixName}_k${k}.nwk
+tail -n +2 ${matrixName}_k${k}_e${e}_mi${mi}_q.matrix  > ${matrixName}_k${k}.Q
+done
+
+
+
+
+
+
+
+
+
+# with downsampling
 # run qpas
 Kmin=3 # min value of k
 Kmax=6 # maximum value of k
