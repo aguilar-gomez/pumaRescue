@@ -69,23 +69,30 @@ for f in ${FASTA}_intervals_* ; do mv ${f} ${f}.bed ; done
 # -rf MappingQualityUnavailable : exclude if there is no mapping quality available
 # There are several ways to estimate coverage, this tool matches the haplotype caller algorithm
 
-# under gatk_DepthOfCoverage folder
-# cp -s /space/s1/lin.yuan/puma/bam_output_allsampletoOutgroup/allbams/* .
-for bam in *.yag.bam; do
+
+
+module load gatk/4.2.0.0
+module load samtools/1.15
+
+REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
+for bam in *.y.bam; 
+do
+samtools index $bam
 NAME=${bam%%.y.*}
+
 gatk DepthOfCoverage \
--RF GoodCigarReadFilter \
--RF NonZeroReferenceLengthAlignmentReadFilter \
--RF PassesVendorQualityCheckReadFilter \
--RF MappingQualityAvailableReadFilter \
--RF MappingQualityReadFilter \
---minimum-mapping-quality 30 \
---min-base-quality 25 \
---omit-depth-output-at-each-base \
--R ${REFERENCE} \
--L ${REFERENCE}.list \
--I ${NAME}.yag.bam \
--O ${NAME}.DepOfCoverage
+  -RF GoodCigarReadFilter \
+  -RF NonZeroReferenceLengthAlignmentReadFilter \
+  -RF PassesVendorQualityCheckReadFilter \
+  -RF MappingQualityAvailableReadFilter \
+  -RF MappingQualityReadFilter \
+  --minimum-mapping-quality 30 \
+  --min-base-quality 25 \
+  --omit-depth-output-at-each-base \
+  -R ${REFERENCE} \
+  -L ${REFERENCE}.list \
+  -I $bam \
+  -O ${NAME}.DepOfCoverage
 done
 
 ################################################################################
@@ -102,12 +109,10 @@ done
 
 . /u/local/Modules/default/init/modules.sh
 
-module load samtools/1.15
 module load gatk/4.2.0.0
 
 NAME=$1
 BAM=$NAME.y.bam
-samtools index ${BAM}
 
 REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 IDX=$(printf %03d ${SGE_TASK_ID})
@@ -121,8 +126,6 @@ gatk HaplotypeCaller \
   -L ${REGION} \
   -I $BAM \
   -O ${NAME}.g.vcf.gz 
-
-
 
 ################################################################################
 ### JOINT VCF FILE PROCESSING
