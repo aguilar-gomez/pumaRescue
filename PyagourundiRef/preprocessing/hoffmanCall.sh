@@ -125,7 +125,7 @@ gatk HaplotypeCaller \
   -R ${REFERENCE} \
   -L ${REGION} \
   -I $BAM \
-  -O ${NAME}.g.vcf.gz 
+  -O ${NAME}_${IDX}.g.vcf.gz 
 
 ################################################################################
 ### JOINT VCF FILE PROCESSING
