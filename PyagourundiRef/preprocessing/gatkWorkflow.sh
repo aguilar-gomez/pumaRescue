@@ -44,21 +44,36 @@ picard CreateSequenceDictionary REFERENCE=${FASTA} OUTPUT=${FASTA%.fna*}.dict
 bwa index -a bwtsw ${FASTA} 
 
 #Generate chunks
-### Make 250 Mb intervals for splitting jobs
+### Make 5 Mb intervals for splitting jobs
 SIZES=${FASTA}.sizes
 #generate windows
-# THE GENOME IS TOO FRAGMENTED.. SEEMS NOT WORKING WELL
-bedtools makewindows -g ${SIZES} -w 250000000 -s 250000000  > ${FASTA}.intervals_250Mb.bed
-#Split by chromosome or scaffold
-split -l1 --numeric-suffixes=1 -a 3 ${FASTA}.intervals_250Mb.bed ${FASTA}.intervals_250Mb_
-for f in ${FASTA}.intervals_250Mb_* ; do mv ${f} ${f}.bed ; done
+# Generate windows for scaffolds larger than 5 Mb
+awk '$2 > 5000000 {print $0}' ${SIZES} > ${FASTA}_large_scaffolds.bed
 
-#Count intervals
-N=$(ls ${FASTA}.intervals_250Mb_*.bed | wc -l)
-N=$((N+1))
 
-mkdir intervals
-mv ${FASTA}.intervals_250Mb_* intervals
+# Generate a single interval for scaffolds <=5 Mb
+awk '$2 <= 5000000 {print $0}' ${SIZES} > ${FASTA}_small_scaffolds.bed
+
+
+# Split large scaffolds by chromosome or scaffold
+split -l 1 --numeric-suffixes=1 -a 3 ${FASTA}_large_scaffolds.bed ${FASTA}_large_scaffolds_
+for f in ${FASTA}_large_scaffolds_* ; do mv ${f} ${f}.bed ; done
+
+
+# Count intervals
+N_large=$(ls ${FASTA}_large_scaffolds_*.bed | wc -l)
+N_large=$((N_large+1))
+
+
+# Create a directory for large scaffolds
+mkdir scaffolds
+mv ${FASTA}_large_scaffolds_* scaffolds
+
+
+# Combine small scaffolds into one interval
+cat ${FASTA}_small_scaffolds.bed > ${FASTA}_small_scaffolds_combined.bed
+mv ${FASTA}_small_scaffolds_combined.bed scaffolds
+
 
 ###DepthOfCoverage
 
