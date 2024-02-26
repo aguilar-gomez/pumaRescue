@@ -72,7 +72,7 @@ for f in ${FASTA}_intervals_* ; do mv ${f} ${f}.bed ; done
 # under gatk_DepthOfCoverage folder
 # cp -s /space/s1/lin.yuan/puma/bam_output_allsampletoOutgroup/allbams/* .
 for bam in *.yag.bam; do
-NAME=${bam%%.yag.*}
+NAME=${bam%%.y.*}
 gatk DepthOfCoverage \
 -RF GoodCigarReadFilter \
 -RF NonZeroReferenceLengthAlignmentReadFilter \
@@ -80,7 +80,7 @@ gatk DepthOfCoverage \
 -RF MappingQualityAvailableReadFilter \
 -RF MappingQualityReadFilter \
 --minimum-mapping-quality 30 \
---min-base-quality 20 \
+--min-base-quality 25 \
 --omit-depth-output-at-each-base \
 -R ${REFERENCE} \
 -L ${REFERENCE}.list \
@@ -109,8 +109,10 @@ NAME=$1
 BAM=$NAME.y.bam
 samtools index ${BAM}
 
+REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 IDX=$(printf %03d ${SGE_TASK_ID})
 REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
+
 gatk HaplotypeCaller \
   -ERC BP_RESOLUTION \
   --minimum-mapping-quality 30 \
