@@ -51,6 +51,9 @@ bedtools makewindows -g ${FASTA}_large_scaffolds.sizes -w 25000000 -s 25000000  
 awk '$2 <= 5000000 && $2 > 100000 {printf "%s\t%d\t%d\n", $1, 0, $2-1}' "${SIZES}" >${FASTA}_small_scaffolds.bed
 
 cat ${FASTA}.intervals_25Mb.bed ${FASTA}_small_scaffolds.bed > ${FASTA}_intervals.bed
+#TOTAL SEQUENCE IN INTERVALS
+#awk '{sum += $3 - $2} END {print sum}' GCF_014898765.1_PumYag_genomic.fna_intervals.bed
+#2,415,546,177
 
 # Split large scaffolds by chromosome or scaffold
 split -l 1 --numeric-suffixes=1 -a 3 ${FASTA}_intervals.bed ${FASTA}_intervals_
@@ -58,7 +61,6 @@ for f in ${FASTA}_intervals_* ; do mv ${f} ${f}.bed ; done
 
 
 ###DepthOfCoverage
-
 # -mbq : minimum Phred quality score
 # -mmq : minimum mapping quality
 # -omitBaseOutput : do not output per base details (to omit unecessary output)
@@ -86,22 +88,39 @@ gatk DepthOfCoverage \
 -O ${NAME}.DepOfCoverage
 done
 
-### Generate gVCF files (may not be very able to do per chromosome..too much file)
-# under gatk_haplotypecaller folder
-# cp -s /space/s1/lin.yuan/puma/bam_output_allsampletoOutgroup/allbams/* .
+################################################################################
+### Generate gVCF files 
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o HapCaller1.log.$JOB_ID.$TASK_ID
+#$ -l highp,h_rt=72:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 4
+#$ -M daguilar
+#$ -t 1-237:1
 
-for bam in *.yag.bam; do
-NAME=${bam%%.yag.*}
+. /u/local/Modules/default/init/modules.sh
 
+module load samtools/1.15
+module load gatk/4.2.0.0
+
+NAME=$1
+BAM=$NAME.y.bam
+samtools index ${BAM}
+
+IDX=$(printf %03d ${SGE_TASK_ID})
+REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
 gatk HaplotypeCaller \
--ERC BP_RESOLUTION \
---minimum-mapping-quality 30 \
---min-base-quality-score 25 \
--R ${REFERENCE} \
--I ${NAME}.yag.bam \
--O ${NAME}.vcf.gz \
---native-pair-hmm-threads 10
-done
+  -ERC BP_RESOLUTION \
+  --minimum-mapping-quality 30 \
+  --min-base-quality-score 25 \
+  -R ${REFERENCE} \
+  -L ${REGION} \
+  -I $BAM \
+  -O ${NAME}.g.vcf.gz 
+
+
 
 ################################################################################
 ### JOINT VCF FILE PROCESSING
