@@ -48,7 +48,7 @@ awk '$2 > 5000000 {print $0}' ${SIZES} > ${FASTA}_large_scaffolds.sizes
 #generate windows for large scaffolds
 bedtools makewindows -g ${FASTA}_large_scaffolds.sizes -w 25000000 -s 25000000  > ${FASTA}.intervals_25Mb.bed
 # Generate a single interval for scaffolds <=5 Mb and they have to be >100Kb
-awk '$2 <= 5000000 && $2 > 100000 {printf "%s\t%d\t%d\n", $1, 0, $2-1}' "${SIZES}" >${FASTA}_small_scaffolds.bed
+awk '$2 <= 5000000 && $2 > 100000 {printf "%s\t%d\t%d\n", $1, 0, $2}' "${SIZES}" >${FASTA}_small_scaffolds.bed
 
 cat ${FASTA}.intervals_25Mb.bed ${FASTA}_small_scaffolds.bed > ${FASTA}_intervals.bed
 #TOTAL SEQUENCE IN INTERVALS
