@@ -25,3 +25,15 @@ echo "Running fq2psmcfa"
 { time fq2psmcfa -q 30 -s 100 fq/${out}noROH.fq.gz > psmcIN/${out}noROH.psmcfa ; } 2> psmcIN/fq2psmc_${out}noROH.time
 { time psmc -N25 -t15 -r5 -p "4+25*2+4+6" -o psmcOUT/${out}noROH.psmc psmcIN/${out}noROH.psmcfa ; } 2> psmcOUT/psmc_${out}noROH.time
 wait
+
+
+
+# trial
+out=$(basename $bamfile .bam)
+{ time samtools mpileup -C50 -u -v -f GCF_014898765.1_PumYag_genomic.fna $bamfile 2> fq/${out}_stderr.txt  | bcftools call -c - | vcfutils.pl vcf2fq -d $mindep -D $maxdep | gzip > fq/${out}noROH.fq.gz ; } 2> fq/bam2fq_${out}noROH.time 
+echo "Waiting for bam2fq to finish"
+wait
+echo "Running fq2psmcfa"
+{ time fq2psmcfa -q 30 -s 100 fq/${out}noROH.fq.gz > psmcIN/${out}noROH.psmcfa ; } 2> psmcIN/fq2psmc_${out}noROH.time
+{ time psmc -N25 -t15 -r5 -p "4+25*2+4+6" -o psmcOUT/${out}noROH.psmc psmcIN/${out}noROH.psmcfa ; } 2> psmcOUT/psmc_${out}noROH.time
+wait
