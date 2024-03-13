@@ -171,7 +171,7 @@ gatk GenotypeGVCFs \
   -R ${REFERENCE} \
   -L ${REGION} \
   -V puma_${IDX}.g.vcf.gz \
-  -O pconcolor_${IDX}.vcf.gz
+  -O puma_allsamples_${IDX}.vcf.gz
 
 ### LeftAlignAndTrimVariants
 ​
