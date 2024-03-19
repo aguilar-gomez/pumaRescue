@@ -202,6 +202,9 @@ echo "mBalRic1.hap2.reference : GCF_028023285.1_mBalRic1.hap2" >> snpEff.config
 cp /u/project/klohmuel/DataRepository/Rice_whale/snpEff_mBalRic1.hap2.tar.gz ~/project-klohmuel/programs/snpEff/data
 tar -xzvf ~/project-klohmuel/programs/snpEff/data/*.tar.gz
 
+#SNPeff database
+/space/s1/lin.yuan/puma/analysis_yagAsReference/snpeff/data/PumYag
+
 #Run snpEff
 module load java/jdk-11.0.14
 module load htslib 
