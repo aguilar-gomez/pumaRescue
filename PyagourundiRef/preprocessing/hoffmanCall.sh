@@ -158,12 +158,20 @@ $(for i in *_${IDX}.g.vcf.gz ; do echo "-V ${i} "; done) \
 #!/bin/bash
 #$ -cwd
 #$ -j y
-#$ -o Combine.log.$JOB_ID.$TASK_ID
+#$ -o genotype.log.$JOB_ID.$TASK_ID
 #$ -l highp,h_rt=72:00:00,h_data=24G
 ## and the number of cores as needed:
 #$ -pe shared 4
 #$ -M daguilar
 #$ -t 1-237:1
+. /u/local/Modules/default/init/modules.sh
+
+module load gatk/4.2.0.0
+#Combine individuals into a single VCF
+IDX=$(printf %03d ${SGE_TASK_ID})
+REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
+REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
+
 gatk GenotypeGVCFs \
   -all-sites \
   -stand-call-conf 0 \
