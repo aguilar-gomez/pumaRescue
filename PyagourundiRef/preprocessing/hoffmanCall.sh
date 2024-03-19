@@ -167,7 +167,6 @@ $(for i in *_${IDX}.g.vcf.gz ; do echo "-V ${i} "; done) \
 . /u/local/Modules/default/init/modules.sh
 
 module load gatk/4.2.0.0
-#Combine individuals into a single VCF
 IDX=$(printf %03d ${SGE_TASK_ID})
 REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
