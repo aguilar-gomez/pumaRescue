@@ -190,14 +190,30 @@ gatk GenotypeGVCFs \
 #Variant Trimming: Variant trimming removes any unnecessary reference bases on the left
 #side of an indel variant. This can result in more concise and easily interpretable 
 #variant representations in the VCF file
+### GenotypeGVCFs
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o genotype.log.$JOB_ID.$TASK_ID
+#$ -l highp,h_rt=72:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 2
+#$ -M daguilar
+#$ -t 1-237:1
+. /u/local/Modules/default/init/modules.sh
+
+module load gatk/4.2.0.0
+
 IDX=$(printf %03d ${SGE_TASK_ID})
+REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
-VCF=pconcolor_${IDX}.vcf.gz
+VCF=puma_allsamples_${IDX}.vcf.gz
+
 gatk LeftAlignAndTrimVariants \
--R ${REFERENCE} \
--L ${REGION} \
--V ${VCF} \
--O ${VCF%.vcf.gz}_LeftAlignTrim.vcf.gz
+  -R ${REFERENCE} \
+  -L ${REGION} \
+  -V ${VCF} \
+  -O ${VCF%.vcf.gz}_LeftAlignTrim.vcf.gz
 
 
 ### SnpEff annotation v5.2
