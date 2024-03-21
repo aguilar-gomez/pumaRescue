@@ -216,27 +216,42 @@ gatk LeftAlignAndTrimVariants \
   -O ${VCF%.vcf.gz}_LeftAlignTrim.vcf.gz
 
 
-### SnpEff annotation v5.2
+### SnpEff annotation 
 # Note: Following instructions in SnpEff manual, custom SnpEff annotation database created
-# Jacqueline created the database
 #Set up before using
-echo "mBalRic1.hap2.genome : Balaenoptera_ricei" >> snpEff.config
-echo "mBalRic1.hap2.reference : GCF_028023285.1_mBalRic1.hap2" >> snpEff.config
-cp /u/project/klohmuel/DataRepository/Rice_whale/snpEff_mBalRic1.hap2.tar.gz ~/project-klohmuel/programs/snpEff/data
-tar -xzvf ~/project-klohmuel/programs/snpEff/data/*.tar.gz
-
 #SNPeff database
-/space/s1/lin.yuan/puma/analysis_yagAsReference/snpeff/data/PumYag
+#on tilden
+#DATABASE=/space/s1/lin.yuan/puma/analysis_yagAsReference/snpeff/data/PumYag
+tar -czvf PumYag.tar.gz PumYag
+
+#hoffman
+cd ~/project-klohmuel/programs/snpEff
+echo "PumYag.genome : Puma_yaguarundi" >> snpEff.config
+echo "PumYag.reference : GCF_014898765.1_PumYag_genomic" >> snpEff.config
+cp ~/project-kirk-bigdata/Pconcolor/PumYag.tar.gz ~/project-klohmuel/programs/snpEff/data
+tar -xzvf ~/project-klohmuel/programs/snpEff/data/PumYag.tar.gz
 
 #Run snpEff
+
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o snpEFF.log.$JOB_ID.$TASK_ID
+#$ -l highp,h_rt=24:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 2
+#$ -M daguilar
+#$ -t 1-237:1
+. /u/local/Modules/default/init/modules.sh
+
 module load java/jdk-11.0.14
 module load htslib 
 
 IDX=$(printf %03d ${SGE_TASK_ID})
 
 export SNPEFF=~/project-klohmuel/programs/snpEff/snpEff.jar
-export DATABASE=mBalRic1.hap2
-export VCF=bricei_joint_${IDX}_LeftAlignTrim.vcf.gz
+export DATABASE=PumYag
+export VCF=puma_allsamples_${IDX}_LeftAlignTrim.vcf.gz
 export OUT=${VCF%_Left*}_snpEff.vcf.gz
 export CSV=${OUT%.vcf.gz}_summary.csv
 
