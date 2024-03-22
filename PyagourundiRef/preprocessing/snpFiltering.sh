@@ -5,7 +5,7 @@
 #$ -o snpCleaner.log.$JOB_ID.$TASK_ID
 #$ -l highp,h_rt=24:00:00,h_data=24G
 ## and the number of cores as needed:
-#$ -pe shared 4
+#$ -pe shared 1
 #$ -M daguilar
 #$ -t 1-237:1
 
