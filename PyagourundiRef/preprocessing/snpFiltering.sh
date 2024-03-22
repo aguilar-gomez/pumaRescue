@@ -11,6 +11,7 @@
 
 . /u/local/Modules/default/init/modules.sh
 
+module load htslib
 IDX=$(printf %03d ${SGE_TASK_ID})
 VCF=puma_allsamples_${IDX}_snpEff.vcf.gz 
 
@@ -34,6 +35,6 @@ SNPCLEANER=~/project-kirk-bigdata/Pconcolor/scripts/snpCleaner.pl
 
 #ultimately calibrated with a histogram of depth in the largest scaffold
 
-$SNPCLEANER  -v -H 1e-6 -h 1e-4 -b 1e-100 \
+zcat $VCF | $SNPCLEANER  -v -H 1e-6 -h 1e-4 -b 1e-100 \
              -S 1e-4 -f 1e-6 -e 1e-4 -B filtered_${IDX}_all2yag.bed -p all2yag_${IDX}_failedsites.txt.bz \ 
-             -d 200 -D 1600 $VCF | bgzip > puma_${IDX}_filter.vcf.gz 
+             -d 200 -D 1600 | bgzip > puma_${IDX}_filter.vcf.gz 
