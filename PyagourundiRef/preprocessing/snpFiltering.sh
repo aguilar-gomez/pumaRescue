@@ -37,4 +37,4 @@ SNPCLEANER=~/project-kirk-bigdata/Pconcolor/scripts/snpCleaner.pl
 
 zcat $VCF | $SNPCLEANER  -v -H 1e-6 -h 1e-4 -b 1e-100 \
              -S 1e-4 -f 1e-6 -e 1e-4 -B filtered_${IDX}_all2yag.bed -p all2yag_${IDX}_failedsites.txt.bz \ 
-             -d 200 -D 1600 | bgzip > puma_${IDX}_filter.vcf.gz 
+             -d 2 -D 200 | bgzip > puma_${IDX}_filter.vcf.gz 
