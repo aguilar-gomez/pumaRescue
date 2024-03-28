@@ -11,3 +11,4 @@
     - 'FS' (Fisher Strand bias)
     - 'MQ' (Mapping Quality)
     - 'SOR' (Strand Odds Ratio)
+3. **SimplifyExtract**: remove sites that fail filters and merge all scaffolds
