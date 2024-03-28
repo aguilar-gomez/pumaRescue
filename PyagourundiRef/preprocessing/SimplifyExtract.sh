@@ -1,3 +1,13 @@
+### FilterVCF
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o simplify.log.$JOB_ID.$TASK_ID
+#$ -l highp,h_rt=24:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 1
+#$ -M daguilar
+#$ -t 1-237:1
 
 ### Simplify & exclude sites failing filters, extract SNPs 
 IDX=$(printf %03d ${SGE_TASK_ID})
