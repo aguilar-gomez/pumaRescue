@@ -38,22 +38,7 @@ rm ../${VCF%.gz}
 rm ${VCF%.vcf.gz}_SIFTpredictions.vcf
 
 
-### VariantFiltration to mask repeats
-# Note: GATK requires indexed mask file
-gatk IndexFeatureFile -I ${REPEATMASK}
-#gatk IndexFeatureFile 
 
-IDX=$(printf %03d ${SGE_TASK_ID})
-VCF=bricei_joint_${IDX}_snpEff_SIFT.vcf.gz  
-REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
-
-gatk VariantFiltration \
--R ${REFERENCE} \
--L ${REGION} \
--mask ${REPEATMASK} --mask-name "FAIL_Repeat" \
--verbosity ERROR \
--V $VCF \
--O ${VCF%.vcf.gz}_LeftAlignTrim_Mask.vcf.gz
 
 
 
