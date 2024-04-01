@@ -2,10 +2,7 @@
 # Repeat masking
 # Define variables:
 export FASTA=GCF_014898765.1_PumYag_genomic.fna
-export SPECIES="Pyagouaroundi"
 export NAME=${FASTA%.fa*}
-
-source ~/anaconda3/etc/profile.d/conda.sh 
 
 module load anaconda3
 #conda create -n repeatmask
@@ -34,8 +31,23 @@ python3 fasta_regex.py GCF_014898765.1_PumYag_genomic.fna.reduced.fasta "[atgcn]
 #Mammalia runs well
 RepeatMasker -engine ncbi -s -align -species "mammalia" -dir PyagRep $FASTA 
 
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o RM.log.txt
+#$ -l highp,h_rt=72:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 4
+#$ -M daguilar
 #Run with specific species
-RepeatMasker -engine ncbi -s -align -species "jaguarundi" -dir PyagRepeatMasked $NAME.reduced.fasta 
+export FASTA=GCF_014898765.1_PumYag_genomic.fna
+export NAME=${FASTA%.fa*}
+. /u/local/Modules/default/init/modules.sh
+
+module load anaconda3
+#conda create -n repeatmask
+conda activate repeatmask
+RepeatMasker -engine ncbi -s -align -species "jaguarundi" -dir PyagRepeatMasked $NAME.reduced.fasta -pa 4
 
 ### RepeatMask VCF
 #!/bin/bash
@@ -75,3 +87,47 @@ gatk VariantFiltration \
 -O ${VCF%.vcf.gz}_LeftAlignTrim_Mask.vcf.gz
 
 
+
+#Remove sex chromosome windows:
+#First index
+#mv windows2remove_both_Feb10_noColName.bed  sexChromosome_windows.bed
+module load gatk/4.2.0.0
+module load bedtools
+
+bedtools sort -i sexChromosome_windows.bed> sexChromosome_windows_sorted.bed
+SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/sexChromosome_windows_sorted.bed
+gatk IndexFeatureFile -I ${SEXMASK}
+
+
+### SexMask VCF
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o RM.log.$JOB_ID.$TASK_ID
+#$ -l highp,h_rt=72:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 1
+#$ -M daguilar
+#$ -t 1-237:1
+
+. /u/local/Modules/default/init/modules.sh
+
+module load gatk/4.2.0.0
+module load htslib
+
+REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
+IDX=$(printf %03d ${SGE_TASK_ID})
+REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
+
+#Regions to exclude:
+SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/sexChromosome_windows_sorted.bed
+VCF=puma_allsamples_${IDX}_snpEff_filter_LeftAlignTrim_Mask.vcf.gz
+
+
+gatk VariantFiltration \
+-R ${REFERENCE} \
+-L ${REGION} \
+-mask ${SEXMASK} --mask-name "FAIL_Sex" \
+-verbosity ERROR \
+-V $VCF \
+-O ${VCF%.vcf.gz}_noSex.vcf.gz
