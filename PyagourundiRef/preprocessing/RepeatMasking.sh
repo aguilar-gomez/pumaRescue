@@ -11,11 +11,13 @@ module load anaconda3
 #conda create -n repeatmask
 conda activate repeatmask
 #conda install -c bioconda -c conda-forge repeatmasker
-#conda install -c bioconda phrap
+
+##Extract fasta that we are actually using
+cat ${FASTA}_large_scaffolds.sizes ${FASTA}_small_scaffolds.bed|cut -f1 > scaffolds2keep
+xargs -a  scaffolds2keep  -I {} samtools faidx $FASTA {} > $NAME.reduced.fasta
 
 #Tutorial:
 #https://darencard.net/blog/2022-07-09-genome-repeat-annotation/
-
 #/u/home/d/daguilar/.conda/envs/repeatmask/bin/RepeatMasker - 4.1.5
 #Mammalia runs well
 RepeatMasker -engine ncbi -s -align -species "mammalia" -dir PyagRep $FASTA 
