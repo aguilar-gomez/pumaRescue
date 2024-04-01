@@ -17,8 +17,16 @@ cat ${FASTA}_large_scaffolds.sizes ${FASTA}_small_scaffolds.bed|cut -f1 > scaffo
 xargs samtools faidx $FASTA < scaffolds2keep > $NAME.reduced.fasta
 
 #Genome is softmasked
+# FROM NCBI:
+#Are repetitive sequences in eukaryotic genomes masked?
+#Repetitive sequences in eukaryotic genome assembly sequence files, 
+#as identified by WindowMasker, have been masked to lower-case.
+#The location and identity of repeats found by RepeatMasker are also
+#provided in a separate file. These spans could be used to mask the
+#genomic sequences if desired. Be aware, however, that many less 
+#studied organisms do not have good repeat libraries available for 
+#RepeatMasker to use.
 python3 fasta_regex.py GCF_014898765.1_PumYag_genomic.fna.reduced.fasta "[atgcn]+" GCF_014898765.1_PumYag_genomic.SoftMask.bed
-
 
 #Tutorial:
 #https://darencard.net/blog/2022-07-09-genome-repeat-annotation/
