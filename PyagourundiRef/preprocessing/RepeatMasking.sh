@@ -14,7 +14,7 @@ conda activate repeatmask
 
 ##Extract fasta that we are actually using
 cat ${FASTA}_large_scaffolds.sizes ${FASTA}_small_scaffolds.bed|cut -f1 > scaffolds2keep
-xargs -a  scaffolds2keep  -I {} samtools faidx $FASTA {} > $NAME.reduced.fasta
+xargs samtools faidx $FASTA < scaffolds2keep > $NAME.reduced.fasta
 
 #Tutorial:
 #https://darencard.net/blog/2022-07-09-genome-repeat-annotation/
