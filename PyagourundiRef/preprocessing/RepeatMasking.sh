@@ -22,9 +22,8 @@ xargs samtools faidx $FASTA < scaffolds2keep > $NAME.reduced.fasta
 #Mammalia runs well
 RepeatMasker -engine ncbi -s -align -species "mammalia" -dir PyagRep $FASTA 
 
-#Test runs well
-RepeatMasker -engine ncbi -s -align -species "carnivora" -dir PyagRep $FASTA 
-RepeatMasker -engine ncbi -s -align -species "felidae" -dir PyagRepFelidae $FASTA 
+#Run with specific species
+RepeatMasker -engine ncbi -s -align -species "jaguarundi" -dir PyagRepeatMasked $NAME.reduced.fasta 
 
 
 
