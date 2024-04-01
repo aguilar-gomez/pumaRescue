@@ -30,4 +30,23 @@ RepeatMasker -engine ncbi -s -align -species "mammalia" -dir PyagRep $FASTA
 RepeatMasker -engine ncbi -s -align -species "jaguarundi" -dir PyagRepeatMasked $NAME.reduced.fasta 
 
 
+#Regions to exclude:
+export SOFTMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/GCF_014898765.1_PumYag_genomic.SoftMask.bed
+### VariantFiltration to mask repeats
+# Note: GATK requires indexed mask file
+gatk IndexFeatureFile -I ${SOFTMASK}
+#gatk IndexFeatureFile 
+
+IDX=$(printf %03d ${SGE_TASK_ID})
+VCF=bricei_joint_${IDX}_snpEff_SIFT.vcf.gz  
+REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
+
+gatk VariantFiltration \
+-R ${REFERENCE} \
+-L ${REGION} \
+-mask ${REPEATMASK} --mask-name "FAIL_Repeat" \
+-verbosity ERROR \
+-V $VCF \
+-O ${VCF%.vcf.gz}_LeftAlignTrim_Mask.vcf.gz
+
 
