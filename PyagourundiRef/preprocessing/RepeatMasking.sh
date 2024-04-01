@@ -2,7 +2,7 @@
 # Repeat masking
 # Define variables:
 export FASTA=
-export SPECIES="Pyaguarundi"
+export SPECIES="Pyagouaroundi"
 export NAME=${FASTA%.fa*}
 
 source ~/anaconda3/etc/profile.d/conda.sh 
