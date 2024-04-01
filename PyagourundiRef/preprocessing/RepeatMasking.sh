@@ -16,6 +16,10 @@ conda activate repeatmask
 cat ${FASTA}_large_scaffolds.sizes ${FASTA}_small_scaffolds.bed|cut -f1 > scaffolds2keep
 xargs samtools faidx $FASTA < scaffolds2keep > $NAME.reduced.fasta
 
+#Genome is softmasked
+python3 fasta_regex.py GCF_014898765.1_PumYag_genomic.fna.reduced.fasta "[atgcn]+" GCF_014898765.1_PumYag_genomic.SoftMask.bed
+
+
 #Tutorial:
 #https://darencard.net/blog/2022-07-09-genome-repeat-annotation/
 #/u/home/d/daguilar/.conda/envs/repeatmask/bin/RepeatMasker - 4.1.5
