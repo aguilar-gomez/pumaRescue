@@ -1,5 +1,9 @@
-1. **CallAnnotate**: call genotypes, left-align, trim and annotate with snpEff
-2. **customFiltering**: Jacqueline Robinson's script
+1. **CallAnnotate**: individual gvcfs
+  2. joint gvcfs
+  3. call genotypes
+  4. left-align, trim
+  5. annotate with snpEff
+6. **customFiltering**: Jacqueline Robinson's script
   - Sites where REF is in [A,C,G,T] and ALT is in [A,C,G,T,.] go on to genotype filtering if AD and DP present in FORMAT
   - Filtered out genotypes are changed to './.', all others reported
   - Genotypes failing filters are set to missing (./.)
@@ -11,4 +15,6 @@
     - 'FS' (Fisher Strand bias)
     - 'MQ' (Mapping Quality)
     - 'SOR' (Strand Odds Ratio)
-3. **SimplifyExtract**: remove sites that fail filters and merge all scaffolds
+7. **RepeatMask**: Mask repeats that were soft masked by NCBI, using WindowMasker
+8. Exclude Sex chromosomes and mitochondria
+9. **SimplifyExtract**: remove sites that fail filters and merge all scaffolds
