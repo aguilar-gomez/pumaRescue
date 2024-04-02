@@ -16,5 +16,5 @@
     - 'MQ' (Mapping Quality)
     - 'SOR' (Strand Odds Ratio)
 7. **RepeatMask**: Mask repeats that were soft masked by NCBI, using WindowMasker
-8. Exclude Sex chromosomes and mitochondria
+8. **SexMask**: Exclude Sex chromosomes and mitochondria and RepeatMasker
 9. **SimplifyExtract**: remove sites that fail filters and merge all scaffolds
