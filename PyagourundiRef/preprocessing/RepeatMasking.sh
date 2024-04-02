@@ -49,6 +49,12 @@ module load anaconda3
 conda activate repeatmask
 RepeatMasker -engine ncbi -s -align -species "jaguarundi" -dir PyagRepeatMasked $NAME.reduced.fasta -pa 4
 
+#Repeat Masker output to bedfile
+awk  -F ' ' 'BEGIN{ OFS = "\t" }{
+    if (NR < 4) {}
+    else {$6 = $6 - 1 ; print $5,$6,$7}
+}'  GCF_014898765.1_PumYag_genomic.fna.reduced.fasta.out  > GCF_014898765.1_PumYag_genomic.fna.RMasker.bed
+
 ### RepeatMask VCF
 #!/bin/bash
 #$ -cwd
@@ -97,7 +103,8 @@ module load bedtools
 bedtools sort -i sexChromosome_windows.bed> sexChromosome_windows_sorted.bed
 SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/sexChromosome_windows_sorted.bed
 gatk IndexFeatureFile -I ${SEXMASK}
-
+cat $SEXMASK GCF_014898765.1_PumYag_genomic.fna.RMasker.bed |bedtools sort | bedtools merge > RepeatSexMasks.bed 
+gatk IndexFeatureFile -I RepeatSexMasks.bed 
 
 ### SexMask VCF
 #!/bin/bash
@@ -120,14 +127,14 @@ IDX=$(printf %03d ${SGE_TASK_ID})
 REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
 
 #Regions to exclude:
-SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/sexChromosome_windows_sorted.bed
+SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/RepeatSexMasks.bed 
 VCF=puma_allsamples_${IDX}_snpEff_filter_LeftAlignTrim_Mask.vcf.gz
 
 
 gatk VariantFiltration \
 -R ${REFERENCE} \
 -L ${REGION} \
--mask ${SEXMASK} --mask-name "FAIL_Sex" \
+-mask ${SEXMASK} --mask-name "FAIL_RMSex" \
 -verbosity ERROR \
 -V $VCF \
 -O ${VCF%.vcf.gz}_noSex.vcf.gz
