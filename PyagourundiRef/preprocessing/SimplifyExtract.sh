@@ -11,7 +11,7 @@
 
 ### Simplify & exclude sites failing filters, extract SNPs 
 IDX=$(printf %03d ${SGE_TASK_ID})
-export VCF=puma_allsamples_${IDX}_snpEff_filter.vcf.gz
+export VCF=puma_allsamples_${IDX}_snpEff_filter_LeftAlignTrim_Mask_noSex.vcf.gz 
 
 bcftools annotate \
 -x ^INFO/AC,INFO/AF,INFO/AN,INFO/ANN,INFO/LOF,INFO/NMD,INFO/SIFTINFO,INFO/VariantType,FORMAT \
@@ -27,7 +27,7 @@ zcat bricei_${IDX}_simple_PASS.vcf.gz\
 
 tabix -p vcf bricei_${IDX}_simple_PASS_variants.vcf.gz
 
-### Concatenate
+### Concatenate ###################################################################################################
 
 ls -v puma_*_simple_PASS.vcf.gz > simplePass.vcflist
 ls -v puma_*_simple_PASS_variants.vcf.gz > Variants.vcflist
