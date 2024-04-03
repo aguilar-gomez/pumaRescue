@@ -9,6 +9,10 @@
 #$ -M daguilar
 #$ -t 1-237:1
 
+. /u/local/Modules/default/init/modules.sh
+module load bcftools
+module load htslib
+
 ### Simplify & exclude sites failing filters, extract SNPs 
 IDX=$(printf %03d ${SGE_TASK_ID})
 export VCF=puma_allsamples_${IDX}_snpEff_filter_LeftAlignTrim_Mask_noSex.vcf.gz 
