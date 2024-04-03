@@ -21,11 +21,11 @@ bcftools annotate \
 
 tabix -p vcf puma_${IDX}_simple_PASS.vcf.gz
 
-zcat bricei_${IDX}_simple_PASS.vcf.gz\
+zcat puma_${IDX}_simple_PASS.vcf.gz\
 | awk '{ if ( $0~/^#/ || $8~"VariantType=SNP" ){print $0}}' \
 | bgzip > puma_${IDX}_simple_PASS_variants.vcf.gz
 
-tabix -p vcf bricei_${IDX}_simple_PASS_variants.vcf.gz
+tabix -p vcf puma_${IDX}_simple_PASS_variants.vcf.gz
 
 ### Concatenate ###################################################################################################
 
