@@ -32,6 +32,20 @@ zcat puma_${IDX}_simple_PASS.vcf.gz\
 tabix -p vcf puma_${IDX}_simple_PASS_variants.vcf.gz
 
 ### Concatenate ###################################################################################################
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o concatALL
+#$ -l highp,h_rt=24:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 1
+#$ -M daguilar
+
+
+. /u/local/Modules/default/init/modules.sh
+module load bcftools
+module load htslib
+
 
 ls -v puma_*_simple_PASS.vcf.gz > simplePass.vcflist
 ls -v puma_*_simple_PASS_variants.vcf.gz > Variants.vcflist
@@ -40,4 +54,6 @@ export NUMTHREADS=8
 
 bcftools concat -f simplePass.vcflist --threads ${NUMTHREADS} -Oz -o puma_simplePASS_all.vcf.gz
 bcftools concat -f variants.vcflist --threads ${NUMTHREADS} -Oz -o puma_simplePASS_variants_all.vcf.gz
+
+#7,242,390 SNPs
 
