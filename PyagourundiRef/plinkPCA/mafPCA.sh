@@ -16,4 +16,4 @@ plink --vcf $VCF--make-bed --out puma_variants \
 OUTPUT_NAME=puma_variantsmaf1
 plink --vcf $VCF --make-bed --out $OUTPUT_NAME --threads 16 --const-fid 0 \
                    --set-missing-var-ids @:#\$1,\$2 --snps-only --biallelic-only \
-                   --allow-extra-chr --maf 0.01 --geno 0.0 --pca
+                   --allow-extra-chr --maf 0.01 --geno 0.05 --pca
