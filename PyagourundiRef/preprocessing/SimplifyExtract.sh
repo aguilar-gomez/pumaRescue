@@ -56,4 +56,5 @@ bcftools concat -f simplePass.vcflist --threads ${NUMTHREADS} -Oz -o puma_simple
 bcftools concat -f variants.vcflist --threads ${NUMTHREADS} -Oz -o puma_simplePASS_variants_all.vcf.gz
 
 #7,242,390 SNPs
+#817,468,470 48230639674 240038322822 total sites
 
