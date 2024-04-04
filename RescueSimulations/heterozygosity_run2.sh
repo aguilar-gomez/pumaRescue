@@ -11,9 +11,10 @@ do
   echo -e "1\t$i" > chromosome_mapping_file.txt
   for file in *vcf
   do
-    tabix $file
+    bgzip $file
+    tabix $file.gz
     out=${file%.vcf}_chr$i.vcf.gz
-    bcftools annotate --rename-chrs chromosome_mapping_file.txt $file -Oz -o $out
+    bcftools annotate --rename-chrs chromosome_mapping_file.txt $file.gz -Oz -o $out
     #Calculate heterozygosity
     python3 $SCRIPT $out scaffolds 1000000 100000 $i &
   done
