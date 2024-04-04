@@ -11,7 +11,7 @@ do
   echo -e "1\t$i" > chromosome_mapping_file.txt
   for file in *vcf
   do
-    bcftools index $file
+    tabix $file
     out=${file%.vcf}_chr$i.vcf.gz
     bcftools annotate --rename-chrs chromosome_mapping_file.txt $file -Oz -o $out
     #Calculate heterozygosity
