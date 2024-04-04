@@ -1,3 +1,6 @@
+for ((i=1; i<=10; i++)); do     echo -e "$i\t100000000"; done > scaffolds
+
+
 #!/bin/bash
 SCRIPT=/space/s2/diana/puma/simulation/simulation_run2/SlidingWindowHet.py
 for i in {1..10}
@@ -5,6 +8,7 @@ do
   #Create directory for "chromosome"
   mkdir -p seed$i
   #mv *seed$i.* seed$i
+  cp scaffolds seed$i
   cd seed$i
   
   #Change name of chromosome
