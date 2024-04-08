@@ -25,7 +25,6 @@ xargs samtools faidx $FASTA < scaffolds2keep > $NAME.reduced.fasta
 #RepeatMasker to use.
 python3 fasta_regex.py GCF_014898765.1_PumYag_genomic.fna.reduced.fasta "[atgcn]+" GCF_014898765.1_PumYag_genomic.SoftMask.bed
  
-
 #!/bin/bash
 #$ -cwd
 #$ -j y
@@ -50,46 +49,9 @@ awk  -F ' ' 'BEGIN{ OFS = "\t" }{
     else {$6 = $6 - 1 ; print $5,$6,$7}
 }'  GCF_014898765.1_PumYag_genomic.fna.reduced.fasta.out  > GCF_014898765.1_PumYag_genomic.fna.RMasker.bed
 
-### RepeatMask VCF
-#!/bin/bash
-#$ -cwd
-#$ -j y
-#$ -o RM.log.$JOB_ID.$TASK_ID
-#$ -l highp,h_rt=72:00:00,h_data=24G
-## and the number of cores as needed:
-#$ -pe shared 1
-#$ -M daguilar
-#$ -t 1-237:1
-
-. /u/local/Modules/default/init/modules.sh
-
-module load gatk/4.2.0.0
-module load htslib
-
-REFERENCE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
-IDX=$(printf %03d ${SGE_TASK_ID})
-REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
-
-#Regions to exclude:
-export REPEATMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/GCF_014898765.1_PumYag_genomic.SoftMask.bed
-### VariantFiltration to mask repeats
-# Note: GATK requires indexed mask file
-#gatk IndexFeatureFile -I ${REPEATMASK}
-
-VCF=puma_allsamples_${IDX}_snpEff_filter.vcf.gz
-tabix -p vcf $VCF
-
-gatk VariantFiltration \
--R ${REFERENCE} \
--L ${REGION} \
--mask ${REPEATMASK} --mask-name "FAIL_Repeat" \
--verbosity ERROR \
--V $VCF \
--O ${VCF%.vcf.gz}_LeftAlignTrim_Mask.vcf.gz
-
-
 
 #Remove sex chromosome windows:
+#Sex chromosome windows provided by Lin Yuan (male vs female coverage & annotation)
 #First index
 #mv windows2remove_both_Feb10_noColName.bed  sexChromosome_windows.bed
 qrsh -l h_rt=4:00:00,h_data=40G -pe shared 2
@@ -102,6 +64,7 @@ REPEATMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/GCF_014898765.
 SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/sexChromosome_windows_sorted.bed
 cat $SEXMASK $SOFTMASK $REPEATMASK |bedtools sort | bedtools merge > RepeatSoftSexMasks.bed 
 gatk IndexFeatureFile -I RepeatSoftSexMasks.bed 
+#Total sequence to mask: 1,283,646,252
 
 ### SexMask VCF
 #!/bin/bash
@@ -125,7 +88,7 @@ REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
 
 #Regions to exclude:
 SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/RepeatSoftSexMasks.bed 
-VCF=puma_allsamples_${IDX}_snpEff_filter_LeftAlignTrim_Mask.vcf.gz
+VCF=puma_allsamples_${IDX}_snpEff.vcf.gz
 
 
 gatk VariantFiltration \
