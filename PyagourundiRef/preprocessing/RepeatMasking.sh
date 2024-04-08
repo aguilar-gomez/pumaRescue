@@ -24,12 +24,7 @@ xargs samtools faidx $FASTA < scaffolds2keep > $NAME.reduced.fasta
 #studied organisms do not have good repeat libraries available for 
 #RepeatMasker to use.
 python3 fasta_regex.py GCF_014898765.1_PumYag_genomic.fna.reduced.fasta "[atgcn]+" GCF_014898765.1_PumYag_genomic.SoftMask.bed
-
-#Tutorial:
-#https://darencard.net/blog/2022-07-09-genome-repeat-annotation/
-#/u/home/d/daguilar/.conda/envs/repeatmask/bin/RepeatMasker - 4.1.5
-#Mammalia runs well
-RepeatMasker -engine ncbi -s -align -species "mammalia" -dir PyagRep $FASTA 
+ 
 
 #!/bin/bash
 #$ -cwd
@@ -97,14 +92,16 @@ gatk VariantFiltration \
 #Remove sex chromosome windows:
 #First index
 #mv windows2remove_both_Feb10_noColName.bed  sexChromosome_windows.bed
+qrsh -l h_rt=4:00:00,h_data=40G -pe shared 2
 module load gatk/4.2.0.0
 module load bedtools
 
 bedtools sort -i sexChromosome_windows.bed> sexChromosome_windows_sorted.bed
+SOFTMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/GCF_014898765.1_PumYag_genomic.SoftMask.bed
+REPEATMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/GCF_014898765.1_PumYag_genomic.fna.RMasker.bed 
 SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/sexChromosome_windows_sorted.bed
-gatk IndexFeatureFile -I ${SEXMASK}
-cat $SEXMASK GCF_014898765.1_PumYag_genomic.fna.RMasker.bed |bedtools sort | bedtools merge > RepeatSexMasks.bed 
-gatk IndexFeatureFile -I RepeatSexMasks.bed 
+cat $SEXMASK $SOFTMASK $REPEATMASK |bedtools sort | bedtools merge > RepeatSoftSexMasks.bed 
+gatk IndexFeatureFile -I RepeatSoftSexMasks.bed 
 
 ### SexMask VCF
 #!/bin/bash
@@ -127,14 +124,14 @@ IDX=$(printf %03d ${SGE_TASK_ID})
 REGION=$(ls $(dirname ${REFERENCE})/intervals/*_${IDX}.bed)
 
 #Regions to exclude:
-SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/RepeatSexMasks.bed 
+SEXMASK=~/project-kirk-bigdata/Pconcolor/genome_outgroup/Masks/RepeatSoftSexMasks.bed 
 VCF=puma_allsamples_${IDX}_snpEff_filter_LeftAlignTrim_Mask.vcf.gz
 
 
 gatk VariantFiltration \
 -R ${REFERENCE} \
 -L ${REGION} \
--mask ${SEXMASK} --mask-name "FAIL_RMSex" \
+-mask ${SEXMASK} --mask-name "FAIL_Repeat_Sex" \
 -verbosity ERROR \
 -V $VCF \
--O ${VCF%.vcf.gz}_noSex.vcf.gz
+-O ${VCF%.vcf.gz}_Mask_noSex.vcf.gz
