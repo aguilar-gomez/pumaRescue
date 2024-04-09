@@ -15,7 +15,7 @@ module load python/2.7.15
 module load htslib
 
 IDX=$(printf %03d ${SGE_TASK_ID})
-VCF=puma_allsamples_${IDX}_snpEff.vcf.gz 
+VCF=puma_allsamples_${IDX}_snpEff_Mask_noSex.vcf.gz
 SCRIPT=~/project-kirk-bigdata/Pconcolor/scripts/filter_puma.py
 
 python2.7 ${SCRIPT} ${VCF} | bgzip > ${VCF%.vcf.gz}_filter.vcf.gz
