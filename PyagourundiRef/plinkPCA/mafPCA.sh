@@ -17,3 +17,5 @@ OUTPUT_NAME=puma_variantsmaf1
 plink --vcf $VCF --make-bed --out $OUTPUT_NAME --threads 16 --const-fid 0 \
                    --set-missing-var-ids @:#\$1,\$2 --snps-only --biallelic-only \
                    --allow-extra-chr --maf 0.01 --geno 0.05 --pca
+#7,268,511 SNPs
+#4,576,792 variants and 50 people pass filters and QC.
