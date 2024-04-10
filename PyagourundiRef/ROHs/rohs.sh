@@ -34,6 +34,15 @@ zcat ${VCF}_bcftoolsROH.txt.gz | tail -n+4 \
 | sed 's/ (average fwd-bwd phred score)//g' \
 | tr ' ' '_'> ${VCF}_bcftoolsROH.txt
 
+#Total sequence analyzed, smaller genome: 2,415,546,177
+DATA=${VCF}_bcftoolsROH.txt.gz
+while read -r SAMPLE ; do 
+zcat ${DATA} \
+| awk -v s=${SAMPLE} 'BEGIN{sum=0}{if ($2==s && $6>=1e6){sum+=$6; num+=1}}END{printf "%s\t%s\t%s\t%s\n", s, sum/2415546177, num, sum/num}'
+done < samples.list > ROHS_pumas.totalgenome
+
+
+
 #NUMBER OF VARIANT AND INVARIANT SITES THAT PASS FILTERS 1059718553 THIS NUMBER NEEDS TO BE MODIFIED
 # Calculate Froh using max length calculated from pseudo-genome
 DATA=${VCF}_bcftoolsROH.txt.gz
