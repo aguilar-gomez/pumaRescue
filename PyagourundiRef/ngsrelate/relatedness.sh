@@ -42,4 +42,4 @@ paste combinations_output.txt relatedness_puma > relatedness_puma_header.txt
 NGSRELATE=~/bin/ngsRelate/ngsRelate
 # l is minMaf
 
-$NGSRELATE -h puma_simplePASS_variants_all.vcf.gz -O relatedness_puma_maf5 -T GT -l .05 -z samples.list -p 10 
+$NGSRELATE -h puma_simplePASS_variants_all.vcf.gz -O relatedness_puma_maf5 -T GT -l .05 -z samples.list -p 10 -e 0.05
