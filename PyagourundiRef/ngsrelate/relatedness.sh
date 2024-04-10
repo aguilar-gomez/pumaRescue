@@ -26,3 +26,20 @@ for ((i = 0; i < length; i++)); do
 done
 
 paste combinations_output.txt relatedness_puma > relatedness_puma_header.txt
+
+
+#Add options in nsgRelate
+#!/bin/sh
+#$ -l highp,h_rt=72:00:00,h_data=24G
+#$ -pe shared 4
+#$ -N Relatedness
+#$ -cwd
+#$ -m bea
+#$ -o ./relate.out
+#$ -e ./relate.err
+#$ -M daguilar
+
+NGSRELATE=~/bin/ngsRelate/ngsRelate
+# l is minMaf
+
+$NGSRELATE -h puma_simplePASS_variants_all.vcf.gz -O relatedness_puma_maf5 -T GT -l .05 -z samples.list -p 10 
