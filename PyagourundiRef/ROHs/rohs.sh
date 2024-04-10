@@ -18,6 +18,8 @@ bcftools roh -G 30 -Orz -o ${VCF}_bcftoolsROH.txt.gz ${VCF}
 #Repeat excluding related individuals and using only autosomes
 #KEEP=samples_keep.list # generate based on relatedness
 # Identify ROH
+# -e, --estimate-AF [TAG],<file>     estimate AF from FORMAT/TAG (GT or PL) of all samples ("-") or samples listed
+#                                            in <file>. If TAG is not given, the frequency is estimated from GT by default
 #bcftools roh -e ${KEEP} -G 30 -Orz -o ${VCF}_bcftoolsROH.txt.gz ${VCF}
 
 # Reformat output
@@ -32,61 +34,6 @@ DATA=${VCF}_bcftoolsROH.txt.gz
 while read -r SAMPLE ; do 
 zcat ${DATA} \
 | awk -v s=${SAMPLE} 'BEGIN{sum=0}{if ($2==s && $6>=1e6){sum+=$6; num+=1}}END{printf "%s\t%s\t%s\t%s\n", s, sum/1059718553, num, sum/num}'
-done < samples.list
-
-#!/bin/sh
-#$ -l highp,h_rt=72:00:00,h_data=24G
-#$ -pe shared 4
-#$ -N ROHs
-#$ -cwd
-#$ -m bea
-#$ -o ./rohv2.out
-#$ -e ./rohv2.err
-#$ -M daguilar
-
-. /u/local/Modules/default/init/modules.sh
-
-module load bcftools
-module load htslib
-
-
-VCF=bricei_simplePASS_variants_autosomes.vcf.gz
-#zcat ${VCF} | head -n 1000 | grep "^#" | tail -n 1 | cut -f10- | tr '\t' '\n' > samples.list
-#KEEP=samples_keep.list
-#grep -v "Bricei011\| Bricei016\| Bricei003\| Bricei024\| Bricei001\| Bricei007\|Bricei021\| Bricei005\| Bricei042\| Bricei015\| Bricei023" samples.list > ${KEEP}
-#grep -v "Bede011\|Bede016\|Bede003\|Bede024\|Bede001\|Bede007\|Bede021\|Bede005\|Bede042\|Bede015\|Bede023" samples.list > ${KEEP}
-# Identify ROH
-bcftools roh -e ${KEEP} -G 30 -Orz -o ${VCF}_bcftoolsROH.txt.gz ${VCF}
-
-# Identify ROH
-# -G, --GTs-only <float>             use GTs and ignore PLs, instead using <float> for PL of the two least likely genotypes.
-bcftools roh -G 30 -Orz -o ${VCF}_bcftoolsROH.txt.gz ${VCF}
-echo STEP1
-
-# Reformat output
-zcat ${VCF}_bcftoolsROH.txt.gz | tail -n+4 \
-| sed 's/# //g' | sed -E 's/\[[0-9]\]//g' | sed 's/ (bp)//g' \
-| sed 's/ (average fwd-bwd phred score)//g' \
-| tr ' ' '_'> ${VCF}_bcftoolsROH.txt
-
-echo STEP2
-# Run with a pseudo-genome with entirely 0/0 genotypes
-#zcat ${IN} | head -n 1000 | grep "^#" > head.tmp
-# Manually edit head.tmp to add a sample name to the last line ("pseudohom")
-IN=bricei_simplePASS_variants_autosomes.vcf.gz
-OUT=bricei_simplePASS_variants_autosomes_pseudohom.vcf.gz
-zcat ${IN} | grep -v "^#" | sed -e 's/$/\t0\/0/g' | cat head.tmp - | bgzip > ${OUT}
-bcftools roh -e ${KEEP} -G 30 -Orz -o bricei_simplePASS_variants_autosomes_pseudohom.vcf.gz ${OUT}
-zcat ${OUT}_bcftoolsROH.txt.gz \
-| awk -v s=pseudohom 'BEGIN{sum=0}{if ($2==s){sum+=$6}}END{printf "%s\t%s\n", s, sum}'
-
-
-# Calculate Froh using max length calculated from pseudo-genome
-DATA=${OUT}_bcftoolsROH.txt.gz
-while read -r SAMPLE ; do 
-zcat ${DATA} \
-| awk -v s=${SAMPLE} 'BEGIN{sum=0}{if ($2==s && $6>=1e6){sum+=$6; num+=1}}END{printf "%s\t%s\t%s\t%s\n", s, sum/
-2560651057, num, sum/num}'
 done < samples.list
 
 
