@@ -36,7 +36,7 @@ zcat ${DATA} \
 | awk -v s=${SAMPLE} 'BEGIN{sum=0}{if ($2==s && $6>=1e6){sum+=$6; num+=1}}END{printf "%s\t%s\t%s\t%s\n", s, sum/1059718553, num, sum/num}'
 done < samples.list
 
-
+################################################################################################################
 ### vcftools see if you can run without splitting by chromosomes
 VCF=bricei_simplePASS_variants_chr.vcf.gz
 for CHR in chr{1..21} ; do
@@ -52,6 +52,7 @@ do
     cat bricei_simplePASS_variants_chr.vcf.gz_vcftools.LROH | grep "$line" | awk -v line="$line" '{ diff = $3 - $2; sum += diff } END { print line, "\t",sum, "\t", NR }'
 done < samples.list
 
+################################################################################################################
 ### plink
 module load plink
 # Convert simplified, concatenated VCF file to plink format
