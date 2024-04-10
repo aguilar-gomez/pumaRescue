@@ -8,6 +8,12 @@
 #$ -o ./rohv2.out
 #$ -e ./rohv2.err
 #$ -M daguilar
+
+. /u/local/Modules/default/init/modules.sh
+
+module load bcftools
+module load htslib
+
 VCF=puma_simplePASS_variants_all.vcf.gz 
 bcftools query -l $VCF >samples.list
 
