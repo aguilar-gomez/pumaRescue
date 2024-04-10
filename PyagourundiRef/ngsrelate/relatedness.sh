@@ -10,3 +10,6 @@
 
 NGSRELATE=~/bin/ngsRelate/ngsRelate
 $NGSRELATE -h puma_simplePASS_variants_all.vcf.gz -O relatedness_puma -T GT
+
+
+#nind:50 overall_number_of_sites:3402662
