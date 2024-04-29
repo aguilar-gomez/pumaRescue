@@ -1,0 +1,8 @@
+bcftools view bricei_minGQ30_SNPs_chr.vcf.gz |grep "|SYNONYMOUS|\|#" > bricei_SYNONYMOUS.vcf
+bcftools view bricei_minGQ30_SNPs_chr.vcf.gz |grep "|NONSYNONYMOUS|\|#" > bricei_NONSYNONYMOUS.vcf
+
+
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H bricei_SYNONYMOUS.vcf  > GT_syn
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H bricei_NONSYNONYMOUS.vcf  > GT_non
+
+/u/home/d/daguilar/project-klohmuel/Bricei/analysis/EmpiricalLoad
