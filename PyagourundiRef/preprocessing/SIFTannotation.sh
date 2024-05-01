@@ -5,9 +5,6 @@ cd test_files/
 cp homo_sapiens-test.txt puma_concolor.txt
 
 
-
-
-
 #!/bin/bash
 #$ -cwd
 #$ -j y
@@ -29,7 +26,7 @@ module load bcftools
 IDX=$(printf %03d ${SGE_TASK_ID})
 export SIFT=~/project-klohmuel/programs/SIFT4G_Annotator.jar
 export DATABASE=~/project-kirk-bigdata/Pconcolor/genome_outgroup/SIFTDatabse
-export VCF=puma_${IDX}_simple_PASS.vcf.gz.tbi
+export VCF=puma_${IDX}_simple_PASS.vcf.gz
 export LOG=${VCF%.vcf.gz}_SIFT.log
 
 
