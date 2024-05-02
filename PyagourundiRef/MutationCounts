@@ -6,3 +6,31 @@ bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H bricei_SYNONYMOUS.vcf  
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H bricei_NONSYNONYMOUS.vcf  > GT_non
 
 /u/home/d/daguilar/project-klohmuel/Bricei/analysis/EmpiricalLoad
+
+
+#PUMAS
+
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -o concatALL
+#$ -l highp,h_rt=24:00:00,h_data=24G
+## and the number of cores as needed:
+#$ -pe shared 1
+#$ -M daguilar
+
+
+. /u/local/Modules/default/init/modules.sh
+module load bcftools
+module load htslib
+
+#ls -v puma_*_simple_PASS*.vcf.gz > list
+
+
+export NUMTHREADS=8
+bcftools concat -f list --threads ${NUMTHREADS} -Oz -o puma_simplePASS_SIFT.vcf.gz
+
+
+
+bcftools view puma_simplePASS_SIFT.vcf.gz |grep "|SYNONYMOUS|\|#" > puma_SYNONYMOUS.vcf
+bcftools view puma_simplePASS_SIFT.vcf.gz |grep "|NONSYNONYMOUS|\|#" > puma_NONSYNONYMOUS.vcf
