@@ -36,23 +36,23 @@ bcftools view puma_simplePASS_SIFT.vcf.gz |grep "|NONSYNONYMOUS|\|#" > puma_NONS
 
 
 #Extract the sites directly
-cat /SIFT*/*xls|grep "DELETERIOUS" > deleterious.SNPs
-cat /SIFT*/*xls|grep "DELETERIOUS" > tolerated.SNPs
+cat SIFT*/*xls|grep "DELETERIOUS" > deleterious.SNPs
+cat SIFT*/*xls|grep "TOLERATED" > tolerated.SNPs
 cut -f9 tolerated.SNPs |sort |uniq -c
 #SIFT results
 Deleterious variants
- 206,403 NONSYNONYMOUS
-    471 START-LOST
-   1,585 SYNONYMOUS
+ 218,226 NONSYNONYMOUS
+    518 START-LOST
+   1,680 SYNONYMOUS
 
 Tolerated variants
- 240,374 NONSYNONYMOUS
-    115 START-LOST
- 492,603 SYNONYMOUS
+256,972 NONSYNONYMOUS
+    132 START-LOST
+ 521,403 SYNONYMOUS
 
 
-bcftools view puma_simplePASS_variants_all.vcf.gz -R tolerated.SNPs > puma_tolerated.vcf
-bcftools view puma_simplePASS_variants_all.vcf.gz -R deleterious.SNPs > puma_deleterious.vcf
+bcftools view puma_simplePASS_SIFT_ALL.vcf.gz -R tolerated.SNPs > puma_tolerated.vcf
+bcftools view puma_simplePASS_SIFT_ALL.vcf.gz -R deleterious.SNPs > puma_deleterious.vcf
 
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_tolerated.vcf  > GT_puma_tol
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_deleterious.vcf  > GT_puma_del
