@@ -49,3 +49,7 @@ Tolerated variants
  240,374 NONSYNONYMOUS
     115 START-LOST
  492,603 SYNONYMOUS
+
+
+bcftools view puma_simplePASS_variants_all.vcf.gz -R tolerated.SNPs > puma_tolerated.vcf
+bcftools view puma_simplePASS_variants_all.vcf.gz -R deleterious.SNPs > puma_deleterious.vcf
