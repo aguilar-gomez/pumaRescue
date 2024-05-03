@@ -34,3 +34,18 @@ bcftools concat -f list --threads ${NUMTHREADS} -Oz -o puma_simplePASS_SIFT.vcf.
 
 bcftools view puma_simplePASS_SIFT.vcf.gz |grep "|SYNONYMOUS|\|#" > puma_SYNONYMOUS.vcf
 bcftools view puma_simplePASS_SIFT.vcf.gz |grep "|NONSYNONYMOUS|\|#" > puma_NONSYNONYMOUS.vcf
+
+
+#Extract the sites directly
+cat ../../SIFT*/*xls|grep "DELETERIOUS" > deleterious.SNPs
+cut -f9 tolerated.SNPs |sort |uniq -c
+#SIFT results
+Deleterious variants
+ 206,403 NONSYNONYMOUS
+    471 START-LOST
+   1,585 SYNONYMOUS
+
+Tolerated variants
+ 240,374 NONSYNONYMOUS
+    115 START-LOST
+ 492,603 SYNONYMOUS
