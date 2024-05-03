@@ -24,20 +24,20 @@ bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H bricei_NONSYNONYMOUS.vc
 module load bcftools
 module load htslib
 
-#ls -v puma_*_simple_PASS*.vcf.gz > list
-
+ls -v puma_*_simple_PASS_SIFT.vcf.gz  > list
 
 export NUMTHREADS=8
-bcftools concat -f list --threads ${NUMTHREADS} -Oz -o puma_simplePASS_SIFT.vcf.gz
+bcftools concat -f list --threads ${NUMTHREADS} -Oz -o puma_simplePASS_SIFT_ALL.vcf.gz
 
-
+####################################################################################################
 
 bcftools view puma_simplePASS_SIFT.vcf.gz |grep "|SYNONYMOUS|\|#" > puma_SYNONYMOUS.vcf
 bcftools view puma_simplePASS_SIFT.vcf.gz |grep "|NONSYNONYMOUS|\|#" > puma_NONSYNONYMOUS.vcf
 
 
 #Extract the sites directly
-cat ../../SIFT*/*xls|grep "DELETERIOUS" > deleterious.SNPs
+cat /SIFT*/*xls|grep "DELETERIOUS" > deleterious.SNPs
+cat /SIFT*/*xls|grep "DELETERIOUS" > tolerated.SNPs
 cut -f9 tolerated.SNPs |sort |uniq -c
 #SIFT results
 Deleterious variants
@@ -61,7 +61,7 @@ sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_tol
 
 
 
-bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H ppuma_SYNONYMOUS.vcf > GT_puma_syn
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_SYNONYMOUS.vcf > GT_puma_syn
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_NONSYNONYMOUS.vcf  > GT_puma_non
 sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_syn
 sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_non
