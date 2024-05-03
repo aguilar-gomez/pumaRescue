@@ -53,3 +53,10 @@ Tolerated variants
 
 bcftools view puma_simplePASS_variants_all.vcf.gz -R tolerated.SNPs > puma_tolerated.vcf
 bcftools view puma_simplePASS_variants_all.vcf.gz -R deleterious.SNPs > puma_deleterious.vcf
+
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_tolerated.vcf  > GT_puma_tol
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_deleterious.vcf  > GT_puma_del
+
+
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_del
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_tol
