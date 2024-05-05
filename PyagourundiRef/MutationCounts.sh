@@ -65,3 +65,12 @@ bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_SYNONYMOUS.vcf > G
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_NONSYNONYMOUS.vcf  > GT_puma_non
 sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_syn
 sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_non
+
+
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_simplePASS_SIFT_ALL.vcf.gz > GT_all_pumas
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_all_pumas
+
+stats --samples '-' puma_simplePASS_SIFT_ALL.vcf.gz --threads 10 |grep "PSC" > counts_PUMAS
+sed  '1 s/\[[0-9]*\]//g; 1 s/# //;' counts_PUMAS
+
+grep -v "Note" counts_PUMAS| cut -f 3-6,14 > counts2normalize
