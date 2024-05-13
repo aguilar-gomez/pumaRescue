@@ -74,3 +74,10 @@ stats --samples '-' puma_simplePASS_SIFT_ALL.vcf.gz --threads 10 |grep "PSC" > c
 sed  '1 s/\[[0-9]*\]//g; 1 s/# //;' counts_PUMAS
 
 grep -v "Note" counts_PUMAS| cut -f 3-6,14 > counts2normalize
+
+
+#Fixed differences between reference (PYag) and Pconcolor
+ bcftools view puma_deleterious.vcf|grep -v "0/"|grep -v "#"|wc
+#  2241  132219 3443615
+bcftools view puma_tolerated.vcf|grep -v "0/"|grep -v "#"|wc
+#  41145 2427555 62501389
