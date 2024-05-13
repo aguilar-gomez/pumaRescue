@@ -81,3 +81,7 @@ grep -v "Note" counts_PUMAS| cut -f 3-6,14 > counts2normalize
 #  2241  132219 3443615
 bcftools view puma_tolerated.vcf|grep -v "0/"|grep -v "#"|wc
 #  41145 2427555 62501389
+
+
+bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep -v "0/"|grep -v "#"|wc
+#4,859,902 286734218 5056444191
