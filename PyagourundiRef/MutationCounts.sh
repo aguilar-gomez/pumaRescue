@@ -77,10 +77,17 @@ grep -v "Note" counts_PUMAS| cut -f 3-6,14 > counts2normalize
 
 
 #Fixed differences between reference (PYag) and Pconcolor
- bcftools view puma_deleterious.vcf|grep -v "0/"|grep -v "#"|wc
-#  2241  132219 3443615
-bcftools view puma_tolerated.vcf|grep -v "0/"|grep -v "#"|wc
-#  41145 2427555 62501389
+grep "AF=1" puma_deleterious.vcf |wc
+#   3,733  220247 7237383
+grep -v "AF=1" puma_deleterious.vcf> puma_deleterious_NotFixed.vcf
+grep "AF=1" puma_tolerated.vcf|wc
+#  68,826 4060734 131974033
+grep -v "AF=1" puma_tolerated.vcf> puma_tolerated_NotFixed.vcf
+
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_deleterious_NotFixed.vcf > GT_puma_del_notFixed
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_tolerated_NotFixed.vcf > GT_puma_tol_notFixed
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_del_notFixed
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_tol_notFixed
 
 
 bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep -v "0/"|grep -v "#"|wc
