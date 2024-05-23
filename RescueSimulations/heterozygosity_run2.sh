@@ -7,7 +7,7 @@ for i in {1..10}
 do   
   #Create directory for "chromosome"
   mkdir -p seed$i
-  #mv *seed$i.* seed$i
+  mv *seed$i.* seed$i
   cp scaffolds seed$i
   cd seed$i
   
