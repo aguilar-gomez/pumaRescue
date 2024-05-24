@@ -92,3 +92,6 @@ sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_tol_notFixed
 
 bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep -v "0/"|grep -v "#"|wc
 #4,859,902 286734218 5056444191
+
+
+bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep "SNP"|grep "LOF" > puma_LOF_SNPs_noheader.vcf
