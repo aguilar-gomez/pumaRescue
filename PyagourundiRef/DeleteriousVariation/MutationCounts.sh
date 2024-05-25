@@ -93,5 +93,10 @@ sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_tol_notFixed
 bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep -v "0/"|grep -v "#"|wc
 #4,859,902 286734218 5056444191
 
+#LOSS of function
+bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep "LOF" > puma_LOF_noheader_v2.vcf
+cut -f1-2 puma_LOF_noheader_v2.vcf > LOF_positions
+bcftools view puma_simplePASS_SIFT_ALL.vcf.gz -R LOF_positions > puma_LOF.vcf
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_LOF.vcf > GT_LOF
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_LOF
 
-bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep "SNP"|grep "LOF" > puma_LOF_SNPs_noheader.vcf
