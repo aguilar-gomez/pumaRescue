@@ -24,3 +24,9 @@ zcat $VCF\
 tabix -p vcf puma_${IDX}_simple_SIFT_SNPs.vcf.gz
 
 
+zcat $VCF\
+| awk '{ if ( $0~/^#/ || $8~"" ){print $0}}' \
+| bgzip > puma_${IDX}_simple_SIFT_SNPs.vcf.gz
+
+
+
