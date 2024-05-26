@@ -82,6 +82,9 @@ grep "AF=1" puma_deleterious.vcf |wc
 grep -v "AF=1" puma_deleterious.vcf> puma_deleterious_NotFixed.vcf
 grep "AF=1" puma_tolerated.vcf|wc
 #  68,826 4060734 131974033
+
+grep "SNP" puma_tolerated.vcf|wc
+#  56,569 3337469 105265084
 grep -v "AF=1" puma_tolerated.vcf> puma_tolerated_NotFixed.vcf
 
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_deleterious_NotFixed.vcf > GT_puma_del_notFixed
@@ -90,13 +93,34 @@ sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_del_notFixed
 sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_tol_notFixed
 
 
+grep -v "DELETERIOUS" puma_tolerated_NotFixed.vcf > puma_toleratedOnly_NotFixed.vcf
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_toleratedOnly_NotFixed.vcf> GT_puma_tolOnly_notFixed
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_puma_tolOnly_notFixed
+
+
 bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep -v "0/"|grep -v "#"|wc
 #4,859,902 286734218 5056444191
 
 #LOSS of function
 bcftools view puma_simplePASS_SIFT_ALL.vcf.gz|grep "LOF" > puma_LOF_noheader_v2.vcf
 cut -f1-2 puma_LOF_noheader_v2.vcf > LOF_positions
+
+grep "SNP" puma_LOF_noheader_v2.vcf|cut -f1-2 > LOF_positions_SNPs
 bcftools view puma_simplePASS_SIFT_ALL.vcf.gz -R LOF_positions > puma_LOF.vcf
-bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_LOF.vcf > GT_LOF
-sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_LOF
+
+#SNPs only (gets rid of Fixed too)
+bcftools view puma_simplePASS_SIFT_ALL.vcf.gz -R LOF_positions_SNPs > puma_LOF_SNPs.vcf
+
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_LOF_SNPs.vcf > GT_LOF_SNPs
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_LOF_SNPs
+
+
+
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT[\t%GT]\n' -H puma_simple_SIFT_SNPs.vcf.gz > GT_all_SNPs
+sed -i '1 s/\[[0-9]*\]//g; 1 s/# //; 1 s/:GT//g' GT_all_SNPs
+
+bcftools stats --samples '-' puma_simple_SIFT_SNPs.vcf.gz  --threads 10 |grep "PSC" > counts_PUMAS_SNPs
+sed  '1 s/\[[0-9]*\]//g; 1 s/# //;' counts_PUMAS_SNPs
+
+grep -v "Note" counts_PUMAS_SNPs| cut -f 3-6,14 > countsALL_SNPs
 
