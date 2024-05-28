@@ -9,10 +9,16 @@ bedtools coverage -a scaffolds_w100kb_s10kb -b geneCoordinates.tsv  | awk '$6==1
 bedtools intersect -b Scaffold_window_GeneDensity.bed -a TXprop.bed -wb|cut -f1-4,11|uniq > TXprop_geneD.bed
 bedtools intersect -b Scaffold_window_GeneDensity.bed -a TXprop.bed -wb|cut -f1-4,8|uniq > TXprop_geneC.bed
 
-
+#5mb windows
 module load bedtools 
 bedtools makewindows -g scaffolds100Kb.len -w 5000000 -s 1000000 > scaffolds_w5Mb_s1Mb
 bedtools coverage -a scaffolds_w5Mb_s1Mb -b geneCoordinates.tsv  | awk '$6==5000000' > Scaffold_window_GeneDensity_w5Mb_s1Mb.bed
 
+
+#find how much gene density is around each of the SNPs with called ancestry
 bedtools intersect -b Scaffold_window_GeneDensity_w5Mb_s1Mb.bed -a TXprop.bed -wb|cut -f1-4,11|uniq > TXprop_geneD.bed
 bedtools intersect -b Scaffold_window_GeneDensity_w5Mb_s1Mb.bed -a TXprop.bed -wb|cut -f1-4,8|uniq > TXprop_geneC.bed
+
+
+#average ancestry within each window
+bedtools intersect -a Scaffold_window_GeneDensity_w5Mb_s1Mb.bed -b TXprop.bed -wb -wa|cut -f1-4,7,11 > Scaffold_w5Mb_s1Mb_TXprop.bed
