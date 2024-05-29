@@ -30,6 +30,8 @@ bedtools coverage -a scaffolds_w5Mb -b exonCoordinates.tsv  | awk '$6==5000000' 
 #average ancestry within each window
 bedtools intersect -a Scaffold_window_ExonDensity_w5Mb.bed -b TXprop.bed -wb -wa|cut -f1-4,7,11 > ScaffoldExonD_w5Mb_TXprop.bed
 
+bedtools coverage -a scaffolds_w5Mb -b geneCoordinates.tsv  | awk '$6==5000000' > Scaffold_window_GeneDensity_w5Mb.bed
+bedtools intersect -a Scaffold_window_GeneDensity_w5Mb.bed -b TXprop.bed -wb -wa|cut -f1-4,7,11 > ScaffoldGeneD_w5Mb_TXprop.bed
 
 #1Mb windows, no sliding and gene
 module load bedtools 
