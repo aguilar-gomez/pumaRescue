@@ -20,7 +20,7 @@ do
     out=${file%.vcf}_chr$i.vcf.gz
     bcftools annotate --rename-chrs chromosome_mapping_file.txt $file.gz -Oz -o $out
     #Calculate heterozygosity
-    python3 $SCRIPT $out scaffolds 1000000 100000 $i &
+    python3 $SCRIPT $out scaffolds 100000 10000 $i &
   done
   cd ..
 done
