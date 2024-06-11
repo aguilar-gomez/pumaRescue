@@ -69,7 +69,11 @@ GR_TX_20runs > averageGRTX
 
 
 
-
+for file in cfp_tx*out
+do
+#grep "^43900\|^43911\|^43916\|^43921\|^43961\|^44011\|^44410" $file > $file.lines
+grep "^15" $file > $file.fitness
+done
 
 
 
