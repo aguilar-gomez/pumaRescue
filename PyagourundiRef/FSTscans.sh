@@ -5,6 +5,7 @@ ls /space/s2/diana/puma/allbams_Pyaguarundi/bam_output_allsampletoOutgroup/TX*ba
 
 #Get sites 
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' puma_simplePASS_variants_all.vcf.gz  > puma_variants
+bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' puma_simplePASS_all.vcf.gz  > puma_sites
 
 #Create Saf files
 
