@@ -6,12 +6,13 @@ ls /space/s2/diana/puma/allbams_Pyaguarundi/bam_output_allsampletoOutgroup/TX*ba
 #Get sites 
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' puma_simplePASS_variants_all.vcf.gz  > puma_variants
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' puma_simplePASS_all.vcf.gz  > puma_sites
-
+SITES=puma_sites
+angsd index sites $SITES
 #Create Saf files
 #No SNP filtering, keep invariable
 bamlist=$1
-REF=/space/s2/diana/pumilio/rescaffolded_genome/Opum.rescaffold.fasta
-/home/diana/bin/angsd -bam $bamlist -out pumilio_sites_all -minInd 250 -setMinDepthInd 1 -minMapQ 25 -minQ 25 -remove_bads 1 -uniqueOnly 1 -only_proper_pairs 1 -GL 1 -doMaf 1 -doMajorMinor 4 -doGlf 2 -nThreads 10 -ref $REF -setMaxDepthInd 50 -doCounts 1 -skipTriallelic 1
+REF=
+angsd -bam $bamlist -out $SITES -minMapQ 25 -minQ 25 -remove_bads 1 -uniqueOnly 1 -only_proper_pairs 1 -GL 1 -doMaf 1 -doMajorMinor 4 -doGlf 2 -nThreads 10 -ref $REF -setMaxDepthInd 50 -doCounts 1 -skipTriallelic 1
 
 #SNP filtering
 #Do all filters and generate beagle simultaneously
