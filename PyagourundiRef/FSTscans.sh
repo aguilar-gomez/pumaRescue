@@ -44,3 +44,21 @@ realSFS fst stats2 $pop1.$pop2.$pop3.fst.idx -win 100000 -step 20000 -type 2 >sl
 #Make SNP windows
 realSFS fst print $pop1.$pop2.$pop3.fst.idx  > $pop1.$pop2.$pop3.printed.txt
 PBS_SNP_windows.py $pop1.$pop2.$pop3.printed.txt $pop1.$pop2.$pop3.wSNP$SNP $SNP
+
+#Tajimas D and thetas 
+#The values of the different thetas are negative because they are logscale!
+
+#Calculate thetas
+realSFS saf2theta $pop.saf.idx -sfs $pop.folded.sfs -outname $pop
+thetaStat print $pop.thetas.idx > $pop.thetas.persite.txt
+
+#For Dxy
+nohup realSFS -P 4 $POP.r.saf.idx -sites $pop1.$pop2.shared.pos -fold 1 1> Results/$POP.sfs 2>Results/$POP.outsfs &
+
+#Calculate Dxy
+$NGSTOOLS/ngsStat -npop 2 -postfiles $pop1.shared.saf $pop2.shared.saf -nsites $NSITES -nind $pop1_nind $pop2_nind -outfile $pop1.$pop2.stats.txt
+
+
+#Do windows of SNPS
+Tajimas_SNPmidpoint.py $pop.thetas.persite.shared.sorted $pop.Tajimas.midpoint.SNP$sites $sites $popsize &
+SNPwindows_midpoint.py $pop1.$pop2.persite.Dxy $pop1.$pop2.SNP200.Dxy.midpoint 200 Dxy &
