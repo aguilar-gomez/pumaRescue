@@ -19,7 +19,7 @@ RF=puma_sites.rf
 bamlist=${POP}bamfiles
 REF=/space/s1/lin.yuan/puma/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 angsd -bam $bamlist -out $POP -sites $SITES -rf $RF -minMapQ 30 -minQ 25 -remove_bads 1 \
-      -uniqueOnly 1 -only_proper_pairs 1 -GL 1 -nThreads 10 -ref $REF -doSaf 1 -baq 1
+      -uniqueOnly 1 -only_proper_pairs 1 -GL 1 -nThreads 10 -ref $REF -anc $REF -doSaf 1 -baq 1
 
 #Run for populations
 nohup sh doSaf.sh CFP > out.CFP &
