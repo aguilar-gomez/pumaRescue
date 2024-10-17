@@ -8,18 +8,21 @@ bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' puma_simplePASS_variants_all.vcf.
 bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\n' puma_simplePASS_all.vcf.gz  > puma_sites
 cut -f1-2 puma_sites > puma_sites.txt
 angsd sites index puma_sites.txt
-
+cut -f1 puma_sites.txt|sort|uniq > puma_sites.rf
 
 #Create Saf files
 #No SNP filtering, keep invariable
+#!/bin/bash
 POP=$1
 SITES=puma_sites.txt
-RF= 
-bamlist=${POP}bamlist
+RF=puma_sites.rf
+bamlist=${POP}bamfiles
 REF=/space/s1/lin.yuan/puma/genome_outgroup/GCF_014898765.1_PumYag_genomic.fna
 angsd -bam $bamlist -out $POP -sites $SITES -rf $RF -minMapQ 30 -minQ 25 -remove_bads 1 \
       -uniqueOnly 1 -only_proper_pairs 1 -GL 1 -nThreads 10 -ref $REF -doSaf 1 -baq 1
 
+#Run for populations
+nohup sh doSaf.sh CFP > out.CFP &
 
 #Fst index and scan use unfolded saf
 pop1=$1
