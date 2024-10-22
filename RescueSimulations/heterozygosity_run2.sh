@@ -3,7 +3,7 @@ for ((i=1; i<=10; i++)); do     echo -e "$i\t100000000"; done > scaffolds
 
 #!/bin/bash
 SCRIPT=/space/s2/diana/puma/simulation/simulation_run2/SlidingWindowHet.py
-for i in {1..10}
+for i in {1..20}
 do   
   #Create directory for "chromosome"
   mkdir -p seed$i
