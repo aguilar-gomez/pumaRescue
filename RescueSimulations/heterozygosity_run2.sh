@@ -1,4 +1,4 @@
-for ((i=1; i<=10; i++)); do     echo -e "$i\t100000000"; done > scaffolds
+for ((i=1; i<=20; i++)); do     echo -e "$i\t50000000"; done > scaffolds
 
 
 #!/bin/bash
