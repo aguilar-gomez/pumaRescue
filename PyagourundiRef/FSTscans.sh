@@ -38,6 +38,10 @@ realSFS fst stats $pop1.$pop2.fst.idx > fstindex$pop1$pop2
 #Fst scan
 realSFS fst stats2 $pop1.$pop2.fst.idx -win 100000 -step 20000 -type 2 > fst_w100kb$pop1$pop2
 
+nohup sh FST.sh CFP TX > outfstCFPTX &
+nohup sh FST.sh PTFPnoF1 TX > outfstPTFPTX &
+nohup sh FST.sh CFP PTFPnoF1 > outfstFP &
+
 
 #PBS code and Windows of SNPs
 #PBS and fst all together
@@ -53,6 +57,7 @@ realSFS fst stats2 $pop1.$pop2.$pop3.fst.idx -win 100000 -step 20000 -type 2 >sl
 #The values of the different thetas are negative because they are logscale!
 
 #Calculate thetas
+#!/bin/bash
 pop=$1
 realSFS saf2theta $pop.saf.idx -sfs $pop.folded.sfs -outname $pop
 thetaStat print $pop.thetas.idx > $pop.thetas.persite.txt
