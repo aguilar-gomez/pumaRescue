@@ -1,3 +1,16 @@
+#Save all the values not only discrete timepoints
+for file in cfp_tx*out
+do
+grep "^15" $file > $file.fitness
+done
+
+
+paste -d " " cfp_tx*_GR_*fitness|cut -d " " -f3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60 > allfitnessGR
+paste -d " " cfp_tx*_noGR_*fitness|cut -d " " -f3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60 > allFitnessnoGR
+
+
+
+
 #Current format
 for file in cfp_tx*out
 do
@@ -33,18 +46,6 @@ awk '
 GR_FL_20runs > averageGRFL
 noGR_FL_20runs > averagenoGRFL
 noGR_TX_20runs > averagenoGRTX
-
-
-
-for file in cfp_tx*out
-do
-#grep "^43900\|^43911\|^43916\|^43921\|^43961\|^44011\|^44410" $file > $file.lines
-grep "^15" $file > $file.fitness
-done
-
-
-paste -d " " cfp_tx_GR_*fitness|cut -d " " -f3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60 > allfitnessGR
-paste -d " " cfp_tx_noGR_*fitness|cut -d " " -f3,6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,57,60 > allFitnessnoGR
 
 
 ################################################################################################################################
