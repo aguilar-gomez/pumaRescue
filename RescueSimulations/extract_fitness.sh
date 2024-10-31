@@ -1,7 +1,7 @@
 #Save all the values not only discrete timepoints
 for file in cfp_tx*out
 do
-grep "^15" $file > $file.fitness
+grep "^15" $file |grep  "0."> $file.fitness
 done
 
 
