@@ -1,0 +1,149 @@
+initialize() {
+	setSeed(output_seed);
+	initializeRecombinationRate(1e-8);
+
+	// set dominance coefficients for different deleterious mutation types
+	defineConstant("h_wkDel", 0.45);
+	defineConstant("h_modDel", 0.2);
+	defineConstant("h_strDel", 0.05);
+	defineConstant("h_semiLet", 0.0);
+	defineConstant("h_let", 0.0);
+
+	// set up discrete DFE with four mutation types coming from gamma DFE
+	// augmented with recessive lethals
+	// adapted from Kyriazis et al. (2023)
+	initializeMutationType("m1", h_wkDel, "s", "do x=rgamma(1,-0.043,0.23); while (x < -0.001); return x;");
+	initializeMutationType("m2", h_modDel, "s", "do x=rgamma(1,-0.043,0.23); while (x < -0.01 | x >= -0.001); return x;");
+	initializeMutationType("m3", h_strDel, "s", "do x=rgamma(1,-0.043,0.23); while (x < -0.1 | x >= -0.01); return x;");
+	initializeMutationType("m4", h_semiLet, "s", "do x=rgamma(1,-0.043,0.23); while (x >= -0.1); return x;");
+	initializeMutationType("m5", h_let,"f", -1.0);
+	// neutral mutations
+	initializeMutationType("m0", 0.5, "f", 0); 
+
+	// proportion of new deleterious mutations that are recessive lethal as determined by Huber et al 2017, adapted from Kyriazis et al. (2023)
+	defineConstant("let_frac", 0.003);
+
+	//MUTATION RATE
+	initializeMutationRate(0.5e-8);
+
+	//GENOMIC ELEMENT TYPES
+	// set proportion of each mutation type as determined by DFE used above augmented with lethals
+	initializeGenomicElementType("g1", c(m1,m2,m3,m4,m5), c(0.329*(1-let_frac), 0.225*(1-let_frac), 0.314*(1-let_frac), 0.132*(1-let_frac), let_frac));
+	initializeGenomicElementType("g2", m0, 1.0); // neutral region
+
+	//CHORMOSOME ORGANIZATION
+	// Total chromosome size
+	total_chromosome_size = 50000000;
+	// Size of g1 and g2
+	g1_size = 200;
+	g2_size = 1800;
+	// Number of g1-g2 pairs along the chromosome
+	num_pairs = asInteger(total_chromosome_size/(g1_size + g2_size));
+    
+	// Iterate through each g1-g2 pair and define the genomic elements
+	for (index in 0:(num_pairs-1)) {
+		initializeGenomicElement(g1, index*(g1_size + g2_size), index*(g1_size + g2_size) + g1_size - 1);
+		initializeGenomicElement(g2, index*(g1_size + g2_size) + g1_size, (index+1)*(g1_size + g2_size) - 1); 
+	}
+}
+
+
+//DEMOGRAPHY AND STRUCTURE
+1 early() {
+	sim.readFromPopulationFile("review/burnin/cfp_tx_burnin_133176_" + input_seed + ".txt");
+}
+133176 late() {
+	sim.addSubpopSplit("p2", 4202, p1); //p2 split from p1
+}
+133178:155910 early() {
+	if (community.tick==133176) {
+		cat("generation p1 p2\n");	
+	}
+	cat(community.tick + " " + mean(p1.cachedFitness(NULL)) + " " + mean(p2.cachedFitness(NULL)) + "\n");
+}
+153900 late() {
+        // output vcf for p2 before bottleneck
+        g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.153900.vcf", simplifyNucleotides=F);
+        // start bottleneck
+}
+153901 early() {
+        p2.setSubpopulationSize(7);
+}
+153910 late() {
+        sim.outputFull("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".full.153910.txt");
+}
+153911 early() {
+        // output vcf for p1 before gene flow
+        g = sample(p1.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p1.153911.vcf", simplifyNucleotides=F);
+        // output vcf for p2 before gene flow
+        g = p2.genomes;
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.153911.vcf", simplifyNucleotides=F);
+        // population size set to 12
+        p2.setSubpopulationSize(12);
+        p2.setMigrationRates(p1, 0.42);
+}
+153911 late() {
+        fromp1 = 0;
+        for (individual in p2.individuals){
+                if (individual.migrant) {
+                        fromp1 = fromp1 + 1;
+                }
+        }
+        cat("size of p2: " + p2.individualCount);
+        cat("; number from p1: " + fromp1);
+        if (fromp1 != 5) {
+                cat("; restart\n");
+                sim.readFromPopulationFile("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".full.153910.txt");
+                se = rdunif(1, 0, asInteger(2^62) - 1);
+                catn("new seed:" + se);
+                setSeed(se);
+        } else {
+                cat("\n");
+        }
+}
+153912 early() {
+        // end migration
+        p2.setMigrationRates(p1, 0);
+        // population size increase to 50
+        p2.setSubpopulationSize(50);
+}
+153916 late() {
+	// output vcf for p2 5 generation after gene flow
+        g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.153916.vcf", simplifyNucleotides=F);
+}
+153921 late() {
+        // output vcf for p2 10 generation after gene flow
+        g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.153921.vcf", simplifyNucleotides=F);
+}
+153961 late() {
+        // output vcf for p2 50 generation after gene flow
+	g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.153961.vcf", simplifyNucleotides=F);
+}
+154011 late() {
+        // output vcf for p2 100 generation after gene flow
+	g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.154011.vcf", simplifyNucleotides=F);
+}
+154411 late() {
+        // output vcf for p2 500 generation after gene flow
+	g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.154411.vcf", simplifyNucleotides=F);
+}
+154911 late() { 
+        // output vcf for p2 1000 generation after gene flow
+        g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.154911.vcf", simplifyNucleotides=F);
+}
+155910 late() { 
+        // output vcf for p2 2000 generation after gene flow
+        g = sample(p2.genomes, 40);
+        g.outputVCF("/global/scratch/users/zhangyulin9806/GR_project/heterozygosity/oldsplit" + rep + "/cfp_tx_oldsplit_GR_seed" + input_seed + ".p2.155910.vcf", simplifyNucleotides=F);
+	sim.simulationFinished();
+}
+
+
