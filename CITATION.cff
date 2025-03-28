@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+title: PumaTranslocations
+message: Bioinformatic analysis and simulations
+type: software
+authors:
+  - given-names: Diana
+    family-names: Aguilar-Gómez
+    email: aguilargomez@ucla.edu
+  - given-names: Yulin
+    family-names: Zhang
+  - given-names: Lin
+    family-names: Yuan
+repository-code: 'https://github.com/aguilar-gomez/pumaRescue/'
+keywords:
+  - genetic rescue
+  - conservation genomics
+  - simulations
+date-released: '2025-03-28'
