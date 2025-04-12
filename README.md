@@ -1,4 +1,8 @@
-# Genomic analysis of post-translocation Florida Panthers, evaluation and forecasting of genetic rescue
+# pumaRescue
+
+## Genomic analysis of post-translocation Florida Panthers, evaluation and forecasting of genetic rescue
+- Genomic analysis with *P.yagouaroundi* as reference
+- Simulations using dadi to understand effects of translocations
 
 ## Associated publication:
 Genetic rescue of Florida panthers reduced homozygosity but did not swamp ancestral genotypes
